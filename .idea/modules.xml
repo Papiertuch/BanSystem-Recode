@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/BanSystem-2.0.iml" filepath="$PROJECT_DIR$/BanSystem-2.0.iml" />
+      <module fileurl="file://$PROJECT_DIR$/bansystem-bukkit/bansystem-bukkit.iml" filepath="$PROJECT_DIR$/bansystem-bukkit/bansystem-bukkit.iml" />
+      <module fileurl="file://$PROJECT_DIR$/bansystem-proxy/bansystem-proxy.iml" filepath="$PROJECT_DIR$/bansystem-proxy/bansystem-proxy.iml" />
+      <module fileurl="file://$PROJECT_DIR$/bansystem-utils/bansystem-utils.iml" filepath="$PROJECT_DIR$/bansystem-utils/bansystem-utils.iml" />
+    </modules>
+  </component>
+</project>
