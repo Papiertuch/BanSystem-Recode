@@ -1,4 +1,13 @@
 package de.papiertuch.proxy.events.report;
 
-public class ProxiedPlayerReportEvent {
+import lombok.AllArgsConstructor;
+import net.md_5.bungee.api.plugin.Event;
+
+import java.util.UUID;
+
+@AllArgsConstructor
+public class ProxiedPlayerReportEvent extends Event {
+
+    private UUID operator, target;
+    private String reason;
 }

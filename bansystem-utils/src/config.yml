@@ -1,0 +1,52 @@
+database:
+  #MySQL, MongoDB
+  type: MySQL
+  host: host
+  port: 3306
+  dataBase: dataBase
+  user: user
+  password: password
+module:
+  cloudNet:
+    v2: false
+    v3: false
+    teamGroups:
+      - Admin
+      - Mod
+      - Sup
+settings:
+  ipBan: true
+  banReasons: 4
+  banReason:
+    1:
+      name: Clientmods
+      duration: 30 d
+      banPoints: 50
+      isReportReason: true
+    2:
+      name: Chat
+      duration: 2 d
+      banPoints: 10
+      isReportReason: true
+    3:
+      name: Advertising
+      duration: -1
+      banPoints: 50
+      isReportReason: true
+    4:
+      name: Other
+      duration: 7 d
+      banPoints: 25
+      isReportReason: true
+  muteReasons: 2
+  muteReason:
+    1:
+      name: Provocation
+      duration: 5 d
+      banPoints: 50
+      isReportReason: true
+    2:
+      name: Chat
+      duration: 2 d
+      banPoints: 10
+      isReportReason: true

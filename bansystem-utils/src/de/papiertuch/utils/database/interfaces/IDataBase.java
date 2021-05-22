@@ -5,7 +5,7 @@ import java.util.function.Consumer;
 
 public interface IDataBase {
 
-    public boolean isExits(UUID uuid);
+    public boolean isExists(UUID uuid);
 
     public void create(UUID uuid);
 
@@ -53,7 +53,7 @@ public interface IDataBase {
 
     public String getAddress(UUID uuid);
 
-    public void isExitsAsync(UUID uuid, Consumer<Boolean> consumer);
+    public void isExistsAsync(UUID uuid, Consumer<Boolean> consumer);
 
     public void createAsync(UUID uuid);
 

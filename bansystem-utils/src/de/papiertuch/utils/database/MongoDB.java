@@ -37,14 +37,18 @@ public class MongoDB implements IDataBase, IPlayerDataBase {
         this.user = user;
         this.password = password;
 
-        this.credential = MongoCredential.createCredential(user, dataBase, password.toCharArray());
-        this.clientOptions = MongoClientOptions.builder().writeConcern(WriteConcern.JOURNALED).build();
-        this.client = new MongoClient(new ServerAddress("127.0.0.1", 27017), Arrays.asList(this.credential), this.clientOptions);
-        this.mongoDatabase = this.client.getDatabase(dataBase);
+        try {
+            this.credential = MongoCredential.createCredential(user, dataBase, password.toCharArray());
+            this.clientOptions = MongoClientOptions.builder().build();
+            this.client = new MongoClient(new ServerAddress(host, port), Arrays.asList(this.credential), this.clientOptions);
+            this.mongoDatabase = this.client.getDatabase(dataBase);
 
-        this.collection = this.mongoDatabase.getCollection(type);
-        this.historyCollection = this.mongoDatabase.getCollection(type + "History");
-
+            this.collection = this.mongoDatabase.getCollection(type);
+            this.historyCollection = this.mongoDatabase.getCollection(type + "History");
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            System.out.println("[BanSystem] The connection to the MongoDB server failed... [" + type + "]");
+        }
     }
 
     public Document getDocument(UUID uuid) {
@@ -60,7 +64,7 @@ public class MongoDB implements IDataBase, IPlayerDataBase {
     }
 
     @Override
-    public boolean isExits(UUID uuid) {
+    public boolean isExists(UUID uuid) {
         return getDocument(uuid) != null;
     }
 
@@ -194,7 +198,7 @@ public class MongoDB implements IDataBase, IPlayerDataBase {
     }
 
     @Override
-    public void isExitsAsync(UUID uuid, Consumer<Boolean> consumer) {
+    public void isExistsAsync(UUID uuid, Consumer<Boolean> consumer) {
 
     }
 
@@ -314,7 +318,7 @@ public class MongoDB implements IDataBase, IPlayerDataBase {
     }
 
     @Override
-    public boolean isExitsPlayer(UUID uuid) {
+    public boolean isExistsPlayer(UUID uuid) {
         return false;
     }
 
@@ -334,7 +338,7 @@ public class MongoDB implements IDataBase, IPlayerDataBase {
     }
 
     @Override
-    public boolean isExitsPlayerAsync(UUID uuid) {
+    public boolean isExistsPlayerAsync(UUID uuid) {
         return false;
     }
 

@@ -10,8 +10,7 @@ import java.util.UUID;
 public class ProxiedPlayerBanEvent extends Event {
 
     private UUID operator;
-    private String name;
-    private String reason;
+    private String name, reason;
     private long duration;
 
 }

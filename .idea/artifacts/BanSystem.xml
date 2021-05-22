@@ -1,0 +1,11 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="BanSystem">
+    <output-path>$USER_HOME$/Desktop/Neuer Ordner/proxy/plugins</output-path>
+    <root id="archive" name="BanSystem.jar">
+      <element id="module-output" name="bansystem-utils" />
+      <element id="module-output" name="bansystem-proxy" />
+      <element id="module-output" name="bansystem-bukkit" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/dependencies/mongo-java-driver-3.12.2.jar" path-in-jar="/" />
+    </root>
+  </artifact>
+</component>

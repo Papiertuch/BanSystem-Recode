@@ -4,7 +4,7 @@ import java.util.UUID;
 
 public interface IPlayerDataBase {
 
-    public boolean isExitsPlayer(UUID uuid);
+    public boolean isExistsPlayer(UUID uuid);
 
     public void createPlayer(UUID uuid);
 
@@ -12,7 +12,7 @@ public interface IPlayerDataBase {
 
     public boolean isNotify(UUID uuid);
 
-    public boolean isExitsPlayerAsync(UUID uuid);
+    public boolean isExistsPlayerAsync(UUID uuid);
 
     public void createPlayerAsync(UUID uuid);
 

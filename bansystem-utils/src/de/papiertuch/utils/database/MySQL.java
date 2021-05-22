@@ -37,7 +37,7 @@ public class MySQL implements IDataBase, IPlayerDataBase {
     }
 
     @Override
-    public boolean isExits(UUID uuid) {
+    public boolean isExists(UUID uuid) {
         try (PreparedStatement preparedStatement = this.connection.prepareStatement("SELECT * FROM ban WHERE name = ?")) {
             preparedStatement.setString(1, uuid.toString());
             ResultSet resultSet = preparedStatement.executeQuery();
@@ -166,7 +166,7 @@ public class MySQL implements IDataBase, IPlayerDataBase {
     }
 
     @Override
-    public void isExitsAsync(UUID uuid, Consumer<Boolean> consumer) {
+    public void isExistsAsync(UUID uuid, Consumer<Boolean> consumer) {
 
     }
 
@@ -286,7 +286,7 @@ public class MySQL implements IDataBase, IPlayerDataBase {
     }
 
     @Override
-    public boolean isExitsPlayer(UUID uuid) {
+    public boolean isExistsPlayer(UUID uuid) {
         return false;
     }
 
@@ -306,7 +306,7 @@ public class MySQL implements IDataBase, IPlayerDataBase {
     }
 
     @Override
-    public boolean isExitsPlayerAsync(UUID uuid) {
+    public boolean isExistsPlayerAsync(UUID uuid) {
         return false;
     }
 
