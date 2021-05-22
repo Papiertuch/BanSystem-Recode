@@ -1,5 +1,6 @@
 package de.papiertuch.utils;
 
+import de.papiertuch.utils.config.Config;
 import de.papiertuch.utils.database.MongoDB;
 import de.papiertuch.utils.database.interfaces.IDataBase;
 import de.papiertuch.utils.database.interfaces.IPlayerDataBase;
@@ -9,15 +10,15 @@ import lombok.Getter;
 import java.util.HashMap;
 import java.util.UUID;
 
+@Getter
 public class BanSystem {
 
     @Getter
     private static BanSystem instance;
-    @Getter
+
     private IDataBase banDataBase, muteDataBase;
-    @Getter
     private IPlayerDataBase playerDataBase;
-    @Getter
+    private Config config, messages;
     private HashMap<UUID, IBanPlayer> banPlayerHashMap;
 
     public BanSystem(String string, String version) {
@@ -39,6 +40,9 @@ public class BanSystem {
         this.banDataBase = new MongoDB("banData", "nachhilfemc.de", 27017, "test", "mongo", "fyUMRnZV5nRevsFS");
         this.muteDataBase = new MongoDB("muteData", "nachhilfemc.de", 27017, "test", "mongo", "fyUMRnZV5nRevsFS");
         this.playerDataBase = new MongoDB("playerData", "nachhilfemc.de", 27017, "test", "mongo", "fyUMRnZV5nRevsFS");
+
+        this.config = new Config("config.yml");
+        this.messages = new Config("messages.yml");
 
         this.banPlayerHashMap = new HashMap<>();
 

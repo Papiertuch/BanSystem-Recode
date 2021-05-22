@@ -8,6 +8,7 @@ import de.papiertuch.utils.database.interfaces.IDataBase;
 import de.papiertuch.utils.database.interfaces.IPlayerDataBase;
 import org.bson.Document;
 
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
@@ -20,36 +21,42 @@ public class MongoDB implements IDataBase, IPlayerDataBase {
     private String host, dataBase, user, password;
     private int port;
 
-    private MongoCredential credential;
-    private MongoClientOptions clientOptions;
-    private MongoClient client;
-    private MongoDatabase mongoDatabase;
+    private static MongoCredential credential;
+    private static MongoClientOptions clientOptions;
+    private static MongoClient client;
+    private static MongoDatabase mongoDatabase;
 
     private MongoCollection<Document> collection, historyCollection;
 
 
-    public MongoDB(String type, String host, int port, String dataBase, String user, String password) {
-        this.executorService = Executors.newCachedThreadPool();
-
+    public MongoDB(String collection, String host, int port, String dataBase, String user, String password) {
         this.host = host;
         this.port = port;
         this.dataBase = dataBase;
         this.user = user;
         this.password = password;
 
+        connect();
+
+        this.executorService = Executors.newCachedThreadPool();
+        this.collection = this.mongoDatabase.getCollection(collection);
+        this.historyCollection = this.mongoDatabase.getCollection(collection + "History");
+    }
+
+    private void connect() {
+        if (this.mongoDatabase != null) return;
         try {
-            this.credential = MongoCredential.createCredential(user, dataBase, password.toCharArray());
+            this.credential = MongoCredential.createScramSha256Credential(user, dataBase, password.toCharArray());
             this.clientOptions = MongoClientOptions.builder().build();
             this.client = new MongoClient(new ServerAddress(host, port), Arrays.asList(this.credential), this.clientOptions);
             this.mongoDatabase = this.client.getDatabase(dataBase);
-
-            this.collection = this.mongoDatabase.getCollection(type);
-            this.historyCollection = this.mongoDatabase.getCollection(type + "History");
+            System.out.println("[BanSystem] The connection to the MongoDB server was successful");
         } catch (Exception ex) {
             ex.printStackTrace();
-            System.out.println("[BanSystem] The connection to the MongoDB server failed... [" + type + "]");
+            System.out.println("[BanSystem] The connection to the MongoDB server failed...");
         }
     }
+
 
     public Document getDocument(UUID uuid) {
         return this.collection.find(Filters.eq("_id", uuid.toString())).first();
@@ -70,9 +77,7 @@ public class MongoDB implements IDataBase, IPlayerDataBase {
 
     @Override
     public void create(UUID uuid) {
-        if (getDocument(uuid) == null) {
-            return;
-        }
+        if (getDocument(uuid) == null) return;
         Document document = new Document();
         document.put("_id", uuid.toString());
         document.put("address", "");
@@ -99,47 +104,47 @@ public class MongoDB implements IDataBase, IPlayerDataBase {
 
     @Override
     public void setReason(UUID uuid, String reason) {
-
+        setValue(uuid, "reason", reason);
     }
 
     @Override
     public void setDate(UUID uuid, long date) {
-
+        setValue(uuid, "date", date);
     }
 
     @Override
     public void setOperator(UUID uuid, String name) {
-
+        setValue(uuid, "operator", name);
     }
 
     @Override
     public void setBanPoints(UUID uuid, int points) {
-
+        setValue(uuid, "banPoints", points);
     }
 
     @Override
     public void setDuration(UUID uuid, long duration) {
-
+        setValue(uuid, "duration", duration);
     }
 
     @Override
     public void setBanInfo(UUID uuid, String info) {
-
+        setValue(uuid, "banInfo", info);
     }
 
     @Override
     public void addBanPoints(UUID uuid, int points) {
-
+        setValue(uuid, "banPoints", (getBanPoints(uuid) + points));
     }
 
     @Override
     public void removeBanPoints(UUID uuid, int points) {
-
+        setValue(uuid, "banPoints", (getBanPoints(uuid) - points));
     }
 
     @Override
     public void setAddress(UUID uuid, String address) {
-
+        setValue(uuid, "address", address);
     }
 
     @Override
@@ -154,206 +159,210 @@ public class MongoDB implements IDataBase, IPlayerDataBase {
 
     @Override
     public boolean getBanned(UUID uuid) {
-        return false;
+        return getDocument(uuid).getBoolean("banned");
     }
 
     @Override
     public boolean getIpBanned(UUID uuid) {
-        return false;
+        return getDocument(uuid).getBoolean("ipBanned");
     }
 
     @Override
     public String getReason(UUID uuid) {
-        return null;
+        return getDocument(uuid).getString("reason");
     }
 
     @Override
     public String getDate(UUID uuid) {
-        return null;
+        return new SimpleDateFormat("dd.MM.yyyy").format(getDocument(uuid).getLong("date"));
     }
 
     @Override
     public String getOperator(UUID uuid) {
-        return null;
+        return getDocument(uuid).getString("operator");
     }
 
     @Override
     public int getBanPoints(UUID uuid) {
-        return 0;
+        return getDocument(uuid).getInteger("banPoints");
     }
 
     @Override
     public long getDuration(UUID uuid) {
-        return 0;
+        return getDocument(uuid).getLong("duration");
     }
 
     @Override
     public String getBanInfo(UUID uuid) {
-        return null;
+        return getDocument(uuid).getString("banInfo");
     }
 
     @Override
     public String getAddress(UUID uuid) {
-        return null;
+        return getDocument(uuid).getString("address");
     }
 
     @Override
     public void isExistsAsync(UUID uuid, Consumer<Boolean> consumer) {
-
+        this.executorService.execute(() -> consumer.accept(isExists(uuid)));
     }
 
     @Override
     public void createAsync(UUID uuid) {
-
+        this.executorService.execute(() -> create(uuid));
     }
 
     @Override
     public void setBannedAsync(UUID uuid, boolean value) {
-
+        this.executorService.execute(() -> setBanned(uuid, value));
     }
 
     @Override
     public void setIpBannedAsync(UUID uuid, boolean value) {
-
+        this.executorService.execute(() -> setIpBanned(uuid, value));
     }
 
     @Override
     public void setReasonAsync(UUID uuid, String reason) {
-
+        this.executorService.execute(() -> setReason(uuid, reason));
     }
 
     @Override
     public void setDateAsync(UUID uuid, long date) {
-
+        this.executorService.execute(() -> setDate(uuid, date));
     }
 
     @Override
     public void setOperatorAsync(UUID uuid, String name) {
-
+        this.executorService.execute(() -> setOperator(uuid, name));
     }
 
     @Override
     public void setBanPointsAsync(UUID uuid, int points) {
-
+        this.executorService.execute(() -> setBanPoints(uuid, points));
     }
 
     @Override
     public void setDurationAsync(UUID uuid, long duration) {
-
+        this.executorService.execute(() -> setDuration(uuid, duration));
     }
 
     @Override
     public void setBanInfoAsync(UUID uuid, String info) {
-
+        this.executorService.execute(() -> setBanInfo(uuid, info));
     }
 
     @Override
     public void addBanPointsAsync(UUID uuid, int points) {
-
+        this.executorService.execute(() -> addBanPoints(uuid, points));
     }
 
     @Override
     public void removeBanPointsAsync(UUID uuid, int points) {
-
+        this.executorService.execute(() -> removeBanPoints(uuid, points));
     }
 
     @Override
     public void setAddressAsync(UUID uuid, String address) {
-
+        this.executorService.execute(() -> setAddress(uuid, address));
     }
 
     @Override
     public void addHistoryAsync(UUID uuid, String reason, String operator) {
-
+        this.executorService.execute(() -> addHistory(uuid, reason, operator));
     }
 
     @Override
     public void editLastHistoryAsync(UUID uuid, String type, String info) {
-
+        this.executorService.execute(() -> editLastHistory(uuid, type, info));
     }
 
     @Override
     public void getBannedAsync(UUID uuid, Consumer<Boolean> consumer) {
-
+        this.executorService.execute(() -> consumer.accept(getBanned(uuid)));
     }
 
     @Override
     public void getIpBannedAsync(UUID uuid, Consumer<Boolean> consumer) {
-
+        this.executorService.execute(() -> consumer.accept(getIpBanned(uuid)));
     }
 
     @Override
     public void getReasonAsync(UUID uuid, Consumer<String> consumer) {
-
+        this.executorService.execute(() -> consumer.accept(getReason(uuid)));
     }
 
     @Override
     public void getDateAsync(UUID uuid, Consumer<String> consumer) {
-
+        this.executorService.execute(() -> consumer.accept(getDate(uuid)));
     }
 
     @Override
     public void getOperatorAsync(UUID uuid, Consumer<String> consumer) {
-
+        this.executorService.execute(() -> consumer.accept(getOperator(uuid)));
     }
 
     @Override
     public void getBanPointsAsync(UUID uuid, Consumer<Integer> consumer) {
-
+        this.executorService.execute(() -> consumer.accept(getBanPoints(uuid)));
     }
 
     @Override
     public void getDurationAsync(UUID uuid, Consumer<Long> consumer) {
-
+        this.executorService.execute(() -> consumer.accept(getDuration(uuid)));
     }
 
     @Override
     public void getBanInfoAsync(UUID uuid, Consumer<String> consumer) {
-
+        this.executorService.execute(() -> consumer.accept(getBanInfo(uuid)));
     }
 
     @Override
     public void getAddressAsync(UUID uuid, Consumer<String> consumer) {
-
+        this.executorService.execute(() -> consumer.accept(getAddress(uuid)));
     }
 
     @Override
     public boolean isExistsPlayer(UUID uuid) {
-        return false;
+        return getDocument(uuid) != null;
     }
 
     @Override
     public void createPlayer(UUID uuid) {
-
+        if (getDocument(uuid) == null) return;
+        Document document = new Document();
+        document.put("_id", uuid.toString());
+        document.put("notify", true);
+        this.collection.insertOne(document);
     }
 
     @Override
     public void setNotify(UUID uuid, boolean value) {
-
+        setValue(uuid, "notify", value);
     }
 
     @Override
     public boolean isNotify(UUID uuid) {
-        return false;
+        return getDocument(uuid).getBoolean("notify");
     }
 
     @Override
-    public boolean isExistsPlayerAsync(UUID uuid) {
-        return false;
+    public void isExistsPlayerAsync(UUID uuid, Consumer<Boolean> consumer) {
+        this.executorService.execute(() -> consumer.accept(isExistsPlayer(uuid)));
     }
 
     @Override
     public void createPlayerAsync(UUID uuid) {
-
+        this.executorService.execute(() -> createPlayer(uuid));
     }
 
     @Override
     public void setNotifyAsync(UUID uuid, boolean value) {
-
+        this.executorService.execute(() -> setNotify(uuid, value));
     }
 
     @Override
-    public boolean isNotifyAsync(UUID uuid) {
-        return false;
+    public void isNotifyAsync(UUID uuid, Consumer<Boolean> consumer) {
+        this.executorService.execute(() -> consumer.accept(isNotify(uuid)));
     }
 }
