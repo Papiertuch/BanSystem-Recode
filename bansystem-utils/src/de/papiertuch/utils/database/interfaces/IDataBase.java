@@ -35,9 +35,9 @@ public interface IDataBase {
 
     public void editLastHistory(UUID uuid, String type, String info);
 
-    public boolean getBanned(UUID uuid);
+    public boolean isBanned(UUID uuid);
 
-    public boolean getIpBanned(UUID uuid);
+    public boolean isIpBanned(UUID uuid);
 
     public String getReason(UUID uuid);
 
@@ -83,9 +83,9 @@ public interface IDataBase {
 
     public void editLastHistoryAsync(UUID uuid, String type, String info);
 
-    public void getBannedAsync(UUID uuid, Consumer<Boolean> consumer);
+    public void isBannedAsync(UUID uuid, Consumer<Boolean> consumer);
 
-    public void getIpBannedAsync(UUID uuid, Consumer<Boolean> consumer);
+    public void isIpBannedAsync(UUID uuid, Consumer<Boolean> consumer);
 
     public void getReasonAsync(UUID uuid, Consumer<String> consumer);
 

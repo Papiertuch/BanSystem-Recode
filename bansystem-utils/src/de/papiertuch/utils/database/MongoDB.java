@@ -4,12 +4,11 @@ import com.mongodb.*;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
+import de.papiertuch.utils.BanSystem;
 import de.papiertuch.utils.database.interfaces.IDataBase;
 import de.papiertuch.utils.database.interfaces.IPlayerDataBase;
 import org.bson.Document;
-
-import java.text.SimpleDateFormat;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -39,17 +38,17 @@ public class MongoDB implements IDataBase, IPlayerDataBase {
         connect();
 
         this.executorService = Executors.newCachedThreadPool();
-        this.collection = this.mongoDatabase.getCollection(collection);
-        this.historyCollection = this.mongoDatabase.getCollection(collection + "History");
+        this.collection = mongoDatabase.getCollection(collection);
+        this.historyCollection = mongoDatabase.getCollection(collection + "History");
     }
 
     private void connect() {
-        if (this.mongoDatabase != null) return;
+        if (mongoDatabase != null) return;
         try {
-            this.credential = MongoCredential.createScramSha256Credential(user, dataBase, password.toCharArray());
-            this.clientOptions = MongoClientOptions.builder().build();
-            this.client = new MongoClient(new ServerAddress(host, port), Arrays.asList(this.credential), this.clientOptions);
-            this.mongoDatabase = this.client.getDatabase(dataBase);
+            credential = MongoCredential.createScramSha256Credential(user, dataBase, password.toCharArray());
+            clientOptions = MongoClientOptions.builder().build();
+            client = new MongoClient(new ServerAddress(host, port), Collections.singletonList(credential), clientOptions);
+            mongoDatabase = client.getDatabase(dataBase);
             System.out.println("[BanSystem] The connection to the MongoDB server was successful");
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -158,12 +157,12 @@ public class MongoDB implements IDataBase, IPlayerDataBase {
     }
 
     @Override
-    public boolean getBanned(UUID uuid) {
+    public boolean isBanned(UUID uuid) {
         return getDocument(uuid).getBoolean("banned");
     }
 
     @Override
-    public boolean getIpBanned(UUID uuid) {
+    public boolean isIpBanned(UUID uuid) {
         return getDocument(uuid).getBoolean("ipBanned");
     }
 
@@ -174,7 +173,7 @@ public class MongoDB implements IDataBase, IPlayerDataBase {
 
     @Override
     public String getDate(UUID uuid) {
-        return new SimpleDateFormat("dd.MM.yyyy").format(getDocument(uuid).getLong("date"));
+        return BanSystem.getInstance().getDateFormat().format(getDocument(uuid).getLong("date"));
     }
 
     @Override
@@ -278,13 +277,13 @@ public class MongoDB implements IDataBase, IPlayerDataBase {
     }
 
     @Override
-    public void getBannedAsync(UUID uuid, Consumer<Boolean> consumer) {
-        this.executorService.execute(() -> consumer.accept(getBanned(uuid)));
+    public void isBannedAsync(UUID uuid, Consumer<Boolean> consumer) {
+        this.executorService.execute(() -> consumer.accept(isBanned(uuid)));
     }
 
     @Override
-    public void getIpBannedAsync(UUID uuid, Consumer<Boolean> consumer) {
-        this.executorService.execute(() -> consumer.accept(getIpBanned(uuid)));
+    public void isIpBannedAsync(UUID uuid, Consumer<Boolean> consumer) {
+        this.executorService.execute(() -> consumer.accept(isIpBanned(uuid)));
     }
 
     @Override

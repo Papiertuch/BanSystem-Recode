@@ -9,6 +9,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
+import java.util.List;
 
 public class Config {
 
@@ -30,6 +31,13 @@ public class Config {
         } catch (IOException ex) {
             ex.printStackTrace();
         }
+    }
+
+    public List<String> getList(String type) {
+        if (this.cache.containsKey(type)) {
+            return (List<String>) this.cache.get(type);
+        }
+        return (List<String>) this.cache.put(type, this.configuration.getStringList(type));
     }
 
     public int getInt(String type) {

@@ -1,3 +1,4 @@
 messages:
   prefix: '§aBanSystem §8» §7'
+  reportPrefix: '§eReport §» §7'
   noPerms: '%prefix% §cYou have no right to do this'

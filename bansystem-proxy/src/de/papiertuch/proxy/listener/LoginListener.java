@@ -12,7 +12,7 @@ public class LoginListener implements Listener {
     @EventHandler
     public void onLogin(LoginEvent event) {
         UUID uuid = event.getConnection().getUniqueId();
-        BanSystem.getInstance().getBanDataBase().createAsync(uuid);
+        BanSystem.getInstance().getBanHandler().getDataBase().createAsync(uuid);
         BanSystem.getInstance().getMuteDataBase().createAsync(uuid);
         BanSystem.getInstance().getPlayerDataBase().createPlayerAsync(uuid);
     }

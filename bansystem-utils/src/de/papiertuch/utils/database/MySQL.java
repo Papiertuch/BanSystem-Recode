@@ -1,5 +1,6 @@
 package de.papiertuch.utils.database;
 
+import de.papiertuch.utils.BanSystem;
 import de.papiertuch.utils.database.interfaces.IDataBase;
 import de.papiertuch.utils.database.interfaces.IPlayerDataBase;
 import org.bson.Document;
@@ -148,12 +149,12 @@ public class MySQL implements IDataBase, IPlayerDataBase {
     }
 
     @Override
-    public boolean getBanned(UUID uuid) {
+    public boolean isBanned(UUID uuid) {
         return (boolean) getValue(uuid, "banned");
     }
 
     @Override
-    public boolean getIpBanned(UUID uuid) {
+    public boolean isIpBanned(UUID uuid) {
         return (boolean) getValue(uuid, "ipBanned");
     }
 
@@ -164,7 +165,7 @@ public class MySQL implements IDataBase, IPlayerDataBase {
 
     @Override
     public String getDate(UUID uuid) {
-        return new SimpleDateFormat("dd.MM.yyyy").format(getValue(uuid, "date"));
+        return BanSystem.getInstance().getDateFormat().format(getValue(uuid, "date"));
     }
 
     @Override
@@ -268,13 +269,13 @@ public class MySQL implements IDataBase, IPlayerDataBase {
     }
 
     @Override
-    public void getBannedAsync(UUID uuid, Consumer<Boolean> consumer) {
-        this.executorService.execute(() -> consumer.accept(getBanned(uuid)));
+    public void isBannedAsync(UUID uuid, Consumer<Boolean> consumer) {
+        this.executorService.execute(() -> consumer.accept(isBanned(uuid)));
     }
 
     @Override
-    public void getIpBannedAsync(UUID uuid, Consumer<Boolean> consumer) {
-        this.executorService.execute(() -> consumer.accept(getIpBanned(uuid)));
+    public void isIpBannedAsync(UUID uuid, Consumer<Boolean> consumer) {
+        this.executorService.execute(() -> consumer.accept(isIpBanned(uuid)));
     }
 
     @Override
