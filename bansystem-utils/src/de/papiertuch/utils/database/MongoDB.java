@@ -70,6 +70,11 @@ public class MongoDB implements IDataBase, IPlayerDataBase {
     }
 
     @Override
+    public boolean isConnected() {
+        return mongoDatabase != null;
+    }
+
+    @Override
     public boolean isExists(UUID uuid) {
         return getDocument(uuid) != null;
     }

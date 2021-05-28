@@ -37,9 +37,7 @@ public class BanCommand extends Command {
                     player.sendMessage("Gibt es nicht");
                     return;
                 }
-                if (BanSystem.getInstance().getBanHandler().banPlayer(
-                        BanSystem.getInstance().getBanPlayer(player.getUniqueId()),
-                        name, reason)) {
+                if (BanSystem.getInstance().getBanHandler().banPlayer(BanSystem.getInstance().getBanPlayer(player.getUniqueId()), name, reason)) {
                     ProxyServer.getInstance().getPluginManager().callEvent(new ProxiedPlayerBanEvent(player.getUniqueId(),
                             name, reason,
                             BanSystem.getInstance().getBanHandler().getDurationLong(reason)));

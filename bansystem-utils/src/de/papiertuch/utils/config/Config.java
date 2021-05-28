@@ -61,4 +61,20 @@ public class Config {
         return (String) this.cache.put(type, this.configuration.getString(type)
                 .replace("%prefix%", this.configuration.getString("messages.prefix")));
     }
+
+    public String getMessage(String key) {
+        int i = 0;
+        StringBuilder stringBuilder = new StringBuilder();
+        for (String screen : getList(key)) {
+            i++;
+            if (i == 1) {
+                stringBuilder.append(screen.replace("%prefix%",
+                        this.configuration.getString("messages.prefix")));
+            } else {
+                stringBuilder.append("\n" + screen.replace("%prefix%",
+                        this.configuration.getString("messages.prefix")));
+            }
+        }
+        return stringBuilder.toString();
+    }
 }

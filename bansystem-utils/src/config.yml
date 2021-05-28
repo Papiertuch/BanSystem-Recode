@@ -17,6 +17,7 @@ module:
   report:
     enable: true
   antiBot:
+    enable: true
     maxAccounts: 2
     #https://iphub.info/apiKey/newFree Create your own free key
     vpnKey: 'Nzg2OTppa2dhbkJOdVZTZms3ODdHNDdjZzRZclhFNWJPSFdTWg=='

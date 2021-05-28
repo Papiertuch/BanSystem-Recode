@@ -10,11 +10,13 @@ import de.papiertuch.utils.handler.ReportHandler;
 import de.papiertuch.utils.player.interfaces.IBanPlayer;
 import lombok.Getter;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.UUID;
+import java.util.*;
+import java.util.concurrent.Executors;
+import java.util.function.Consumer;
 
 @Getter
 public class BanSystem {
@@ -22,9 +24,11 @@ public class BanSystem {
     @Getter
     private static BanSystem instance;
 
+    private String version;
+
     private IDataBase muteDataBase;
     private IPlayerDataBase playerDataBase;
-    private Config config, messages;
+    private Config config, messages, blacklist;
     private UUIDFetcher uuidFetcher;
     private BanHandler banHandler;
     private MuteHandler muteHandler;
@@ -32,10 +36,11 @@ public class BanSystem {
     private SimpleDateFormat dateFormat;
 
     private HashMap<UUID, IBanPlayer> banPlayerHashMap;
+    private HashMap<String, List<UUID>> accounts;
     private ArrayList<IBanPlayer> notify;
     private ArrayList<Reason> banReason, muteReason;
 
-    public BanSystem(String string, String version) {
+    public BanSystem(String software, String currentVersion) {
         instance = this;
         System.out.print(" ____               _____           _                 ");
         System.out.print("|  _ \\             / ____|         | |                ");
@@ -46,8 +51,16 @@ public class BanSystem {
         System.out.print("                           __/ |                      ");
         System.out.print("                          |___/                       ");
         System.out.print("                                                       ");
-        System.out.println("> " + string + " | Discord: https://papiertu.ch/go/discord/");
-        System.out.println("> Pluginversion: " + version);
+        System.out.println("> by Papiertuch | Discord: https://papiertu.ch/go/discord/");
+        System.out.println("> Software: " + software);
+        System.out.println("> Pluginversion: " + currentVersion);
+
+        this.version = checkUpdate();
+
+        if (!this.version.equalsIgnoreCase(currentVersion)) {
+            System.out.println("[BanSystem] A new version is available: " + this.version);
+            System.out.println("[BanSystem] Download: https://www.spigotmc.org/resources/bansystem-for-bungeecord-or-bukkit-mysql.57979/");
+        }
 
         this.uuidFetcher = new UUIDFetcher();
         this.banHandler = new BanHandler();
@@ -62,8 +75,10 @@ public class BanSystem {
 
         this.config = new Config("config.yml");
         this.messages = new Config("messages.yml");
+        this.blacklist = new Config("blacklist.yml");
 
         this.banPlayerHashMap = new HashMap<>();
+        this.accounts = new HashMap<>();
 
         this.banReason = new ArrayList<>();
         this.muteReason = new ArrayList<>();
@@ -93,5 +108,16 @@ public class BanSystem {
             return this.banPlayerHashMap.get(uuid);
         }
         return null;
+    }
+
+    public String checkUpdate() {
+        try (InputStream inputStream = new URL("https://api.spigotmc.org/legacy/update.php?resource=" + 57979).openStream(); Scanner scanner = new Scanner(inputStream)) {
+            if (scanner.hasNext()) {
+              return scanner.next();
+            }
+        } catch (IOException exception) {
+            System.out.println("[BanSystem] No connection to the WebServer could be established, you will not receive update notifications");
+        }
+        return "null";
     }
 }

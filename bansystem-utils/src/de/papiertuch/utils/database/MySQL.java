@@ -74,6 +74,11 @@ public class MySQL implements IDataBase, IPlayerDataBase {
     }
 
     @Override
+    public boolean isConnected() {
+        return connection != null;
+    }
+
+    @Override
     public boolean isExists(UUID uuid) {
         return getValue(uuid, "uuid") != null;
     }

@@ -5,6 +5,8 @@ import java.util.function.Consumer;
 
 public interface IPlayerDataBase {
 
+    public boolean isConnected();
+
     public boolean isExistsPlayer(UUID uuid);
 
     public void createPlayer(UUID uuid);

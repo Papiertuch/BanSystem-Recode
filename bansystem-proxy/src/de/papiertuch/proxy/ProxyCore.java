@@ -1,7 +1,9 @@
 package de.papiertuch.proxy;
 
 import de.papiertuch.proxy.commands.ban.BanCommand;
+import de.papiertuch.proxy.listener.ChatListener;
 import de.papiertuch.proxy.listener.LoginListener;
+import de.papiertuch.proxy.listener.PlayerDisconnectListener;
 import de.papiertuch.proxy.listener.PostLoginListener;
 import de.papiertuch.utils.BanSystem;
 import de.papiertuch.utils.player.ProxiedCommandSender;
@@ -29,6 +31,8 @@ public class ProxyCore extends Plugin {
         PluginManager pluginManager = this.getProxy().getPluginManager();
         pluginManager.registerListener(this, new LoginListener());
         pluginManager.registerListener(this, new PostLoginListener());
+        pluginManager.registerListener(this, new ChatListener());
+        pluginManager.registerListener(this, new PlayerDisconnectListener());
 
         pluginManager.registerCommand(this, new BanCommand());
     }

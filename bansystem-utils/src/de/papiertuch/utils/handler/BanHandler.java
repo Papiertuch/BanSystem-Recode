@@ -11,21 +11,58 @@ import de.papiertuch.utils.database.MongoDB;
 import de.papiertuch.utils.database.interfaces.IDataBase;
 import de.papiertuch.utils.player.interfaces.IBanPlayer;
 import lombok.Getter;
+import net.md_5.bungee.api.ProxyServer;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.HashMap;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 public class BanHandler {
 
     @Getter
     private IDataBase dataBase;
     private Config config;
+    private HashMap<String, Boolean> cache;
 
     public BanHandler() {
         this.dataBase = new MongoDB("banData", "nachhilfemc.de", 27017, "test", "mongo", "fyUMRnZV5nRevsFS");
         this.config = BanSystem.getInstance().getConfig();
+        this.cache = new HashMap<>();
+    }
+
+    public void hasVPN(String address, Consumer<Boolean> consumer) {
+        try {
+            if (this.cache.containsKey(address)) {
+                consumer.accept(this.cache.get(address));
+            }
+            int block;
+            OkHttpClient caller = new OkHttpClient();
+            Request request = new Request.Builder().url("http://v2.api.iphub.info/ip/" + address)
+                    .addHeader("X-Key", BanSystem.getInstance().getConfig().getString("module.antiBot.vpnKey")).build();
+            try {
+                Response response = caller.newCall(request).execute();
+                JSONObject json = new JSONObject(response.body().string());
+                block = (int) json.get("block");
+                if (block == 1) {
+                    consumer.accept(this.cache.put(address, true));
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            consumer.accept(this.cache.put(address, false));
+        } catch (JSONException e) {
+            ProxyServer.getInstance().getConsole().sendMessage("[BanSystem] §cNo VPN key was found...");
+        }
+        consumer.accept(false);
     }
 
     public boolean banPlayer(IBanPlayer banPlayer, String name, String reason) {
-       return banPlayer(banPlayer, name, reason, getDurationLong(reason));
+        return banPlayer(banPlayer, name, reason, getDurationLong(reason));
     }
 
     public boolean banPlayer(IBanPlayer banPlayer, String name, String reason, long duration) {
