@@ -101,7 +101,7 @@ public class BanHandler {
                 }
             }
         }
-        long banTime;
+        long banTime = 0l;
         if (!duration.equalsIgnoreCase("-1")) {
             banTime = getDurationLong(duration) + System.currentTimeMillis();
         }
@@ -128,6 +128,7 @@ public class BanHandler {
             dataBase.setBanInfoAsync(uuid, info[0]);
             dataBase.editLastHistoryAsync(uuid, "banInfo", info[0]);
         }
+        dataBase.setDurationAsync(uuid, banTime);
         dataBase.addBanPointsAsync(uuid, reasonObject.getPoints());
         dataBase.setReasonAsync(uuid, reasonObject.getName());
         dataBase.setBannedAsync(uuid, true);
@@ -136,7 +137,6 @@ public class BanHandler {
 
         if (target != null) {
             dataBase.setAddressAsync(uuid, target.getAddress());
-            dataBase.setIpBannedAsync(uuid, true);
             target.disconnect("Du bist gebannt...");
         }
 
@@ -165,7 +165,6 @@ public class BanHandler {
 
         dataBase.removeBanPointsAsync(uuid, getReason(dataBase.getReason(uuid)).getPoints());
         dataBase.setBannedAsync(uuid, false);
-        dataBase.setIpBannedAsync(uuid, false);
         dataBase.setDurationAsync(uuid, 0);
         dataBase.setReasonAsync(uuid, "");
         dataBase.setOperatorAsync(uuid, "");
@@ -173,6 +172,15 @@ public class BanHandler {
         dataBase.setBanInfoAsync(uuid, "");
         dataBase.editLastHistoryAsync(uuid, "unban", banPlayer.getName() + "-" + BanSystem.getInstance().getDateFormat().format(new Date()));
         return true;
+    }
+
+    public void resetBan(UUID uuid) {
+        dataBase.setBannedAsync(uuid, false);
+        dataBase.setDurationAsync(uuid, 0);
+        dataBase.setReasonAsync(uuid, "");
+        dataBase.setOperatorAsync(uuid, "");
+        dataBase.setDateAsync(uuid, "");
+        dataBase.setBanInfoAsync(uuid, "");
     }
 
     public long getDurationLong(String string) {

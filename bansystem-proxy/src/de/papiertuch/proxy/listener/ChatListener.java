@@ -33,13 +33,7 @@ public class ChatListener implements Listener {
             if (muted) {
                 dataBase.getDurationAsync(player.getUniqueId(), duration -> {
                     if (duration != -1 && duration <= System.currentTimeMillis()) {
-                        dataBase.setBannedAsync(player.getUniqueId(), false);
-                        dataBase.setIpBannedAsync(player.getUniqueId(), false);
-                        dataBase.setDurationAsync(player.getUniqueId(), 0);
-                        dataBase.setReasonAsync(player.getUniqueId(), "");
-                        dataBase.setOperatorAsync(player.getUniqueId(), "");
-                        dataBase.setDateAsync(player.getUniqueId(), "");
-                        dataBase.setBanInfoAsync(player.getUniqueId(), "");
+                        BanSystem.getInstance().getMuteHandler().resetBan(player.getUniqueId());
                         return;
                     }
                     event.setCancelled(true);

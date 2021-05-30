@@ -1,5 +1,8 @@
 package de.papiertuch.utils.database.interfaces;
 
+import org.bson.Document;
+
+import java.util.ArrayList;
 import java.util.UUID;
 import java.util.function.Consumer;
 
@@ -10,8 +13,6 @@ public interface IDataBase {
     public void create(UUID uuid);
 
     public void setBanned(UUID uuid, boolean value);
-
-    public void setIpBanned(UUID uuid, boolean value);
 
     public void setReason(UUID uuid, String reason);
 
@@ -34,6 +35,8 @@ public interface IDataBase {
     public void addHistory(UUID uuid, String reason, String operator);
 
     public void editLastHistory(UUID uuid, String type, String info);
+
+    public ArrayList<Document> getHistory(UUID uuid);
 
     public boolean isBanned(UUID uuid);
 
@@ -59,8 +62,6 @@ public interface IDataBase {
 
     public void setBannedAsync(UUID uuid, boolean value);
 
-    public void setIpBannedAsync(UUID uuid, boolean value);
-
     public void setReasonAsync(UUID uuid, String reason);
 
     public void setDateAsync(UUID uuid, String date);
@@ -82,6 +83,8 @@ public interface IDataBase {
     public void addHistoryAsync(UUID uuid, String reason, String operator);
 
     public void editLastHistoryAsync(UUID uuid, String type, String info);
+
+    public void getHistoryAsync(UUID uuid, Consumer<ArrayList<Document>> consumer);
 
     public void isBannedAsync(UUID uuid, Consumer<Boolean> consumer);
 

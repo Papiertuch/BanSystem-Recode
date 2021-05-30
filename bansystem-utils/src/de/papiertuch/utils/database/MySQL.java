@@ -7,6 +7,7 @@ import org.bson.Document;
 
 import java.sql.*;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -94,11 +95,6 @@ public class MySQL implements IDataBase, IPlayerDataBase {
     }
 
     @Override
-    public void setIpBanned(UUID uuid, boolean value) {
-        setValue(uuid, "ipBanned", value);
-    }
-
-    @Override
     public void setReason(UUID uuid, String reason) {
         setValue(uuid, "reason", reason);
     }
@@ -151,6 +147,11 @@ public class MySQL implements IDataBase, IPlayerDataBase {
     @Override
     public void editLastHistory(UUID uuid, String type, String info) {
 
+    }
+
+    @Override
+    public ArrayList<Document> getHistory(UUID uuid) {
+        return null;
     }
 
     @Override
@@ -215,11 +216,6 @@ public class MySQL implements IDataBase, IPlayerDataBase {
     }
 
     @Override
-    public void setIpBannedAsync(UUID uuid, boolean value) {
-        this.executorService.execute(() -> setIpBanned(uuid, value));
-    }
-
-    @Override
     public void setReasonAsync(UUID uuid, String reason) {
         this.executorService.execute(() -> setReason(uuid, reason));
     }
@@ -272,6 +268,11 @@ public class MySQL implements IDataBase, IPlayerDataBase {
     @Override
     public void editLastHistoryAsync(UUID uuid, String type, String info) {
         this.executorService.execute(() -> editLastHistory(uuid, type, info));
+    }
+
+    @Override
+    public void getHistoryAsync(UUID uuid, Consumer<ArrayList<Document>> consumer) {
+
     }
 
     @Override

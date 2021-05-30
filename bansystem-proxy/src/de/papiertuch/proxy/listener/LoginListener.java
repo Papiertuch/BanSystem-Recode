@@ -55,13 +55,7 @@ public class LoginListener implements Listener {
             if (dataBase.isBanned(uuid)) {
                 long duration = dataBase.getDuration(uuid);
                 if (duration != -1 && duration <= System.currentTimeMillis()) {
-                    dataBase.setBannedAsync(uuid, false);
-                    dataBase.setIpBannedAsync(uuid, false);
-                    dataBase.setDurationAsync(uuid, 0);
-                    dataBase.setReasonAsync(uuid, "");
-                    dataBase.setOperatorAsync(uuid, "");
-                    dataBase.setDateAsync(uuid, "");
-                    dataBase.setBanInfoAsync(uuid, "");
+                    BanSystem.getInstance().getBanHandler().resetBan(uuid);
                 } else {
                     event.setCancelReason("Ban Screen");
                     event.setCancelled(true);
