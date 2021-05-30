@@ -20,6 +20,11 @@ public class ProxiedCommandSender implements IBanPlayer {
     }
 
     @Override
+    public void disconnect(String string) {
+
+    }
+
+    @Override
     public String getName() {
         return "CONSOLE";
     }
@@ -37,6 +42,11 @@ public class ProxiedCommandSender implements IBanPlayer {
     @Override
     public String getServer() {
         return null;
+    }
+
+    @Override
+    public String getAddress() {
+        return "127.0.0.1";
     }
 
     @Override

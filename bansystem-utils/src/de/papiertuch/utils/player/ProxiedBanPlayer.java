@@ -22,6 +22,11 @@ public class ProxiedBanPlayer implements IBanPlayer {
     }
 
     @Override
+    public void disconnect(String string) {
+        player.disconnect(string);
+    }
+
+    @Override
     public String getName() {
         return player.getName();
     }
@@ -39,6 +44,11 @@ public class ProxiedBanPlayer implements IBanPlayer {
     @Override
     public String getServer() {
         return player.getServer().getInfo().getName();
+    }
+
+    @Override
+    public String getAddress() {
+        return player.getAddress().getHostString();
     }
 
     @Override

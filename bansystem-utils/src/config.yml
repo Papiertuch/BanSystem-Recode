@@ -28,32 +28,32 @@ settings:
     1:
       name: Clientmods
       duration: 30 d
-      banPoints: 50
+      points: 50
       isReportReason: true
     2:
       name: Chat
       duration: 2 d
-      banPoints: 10
+      points: 10
       isReportReason: true
     3:
       name: Advertising
       duration: -1
-      banPoints: 50
+      points: 50
       isReportReason: true
     4:
       name: Other
       duration: 7 d
-      banPoints: 25
+      points: 25
       isReportReason: true
   muteReasons: 2
   muteReason:
     1:
       name: Provocation
       duration: 5 d
-      banPoints: 50
+      points: 50
       isReportReason: true
     2:
       name: Chat
       duration: 2 d
-      banPoints: 10
+      points: 10
       isReportReason: true

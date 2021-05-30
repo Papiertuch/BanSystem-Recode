@@ -42,7 +42,10 @@ public class BanCommand extends Command {
                             name, reason,
                             BanSystem.getInstance().getBanHandler().getDurationLong(reason)));
                 }
-                return;
+                break;
+            default:
+                player.sendMessage("SYNTAX");
+                break;
         }
     }
 

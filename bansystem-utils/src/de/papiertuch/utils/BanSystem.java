@@ -88,6 +88,7 @@ public class BanSystem {
             this.banReason.add(new Reason(
                     config.getString("settings.banReason." + i + ".name"), i,
                     config.getString("settings.banReason." + i + ".duration"),
+                    config.getInt("settings.banReason." + i + ".points"),
                     config.getBoolean("settings.banReason." + i + ".isReportReason")));
         }
 
@@ -95,6 +96,7 @@ public class BanSystem {
             this.muteReason.add(new Reason(
                     config.getString("settings.muteReason." + i + ".name"), i,
                     config.getString("settings.muteReason." + i + ".duration"),
+                    config.getInt("settings.muteReason." + i + ".points"),
                     config.getBoolean("settings.muteReason." + i + ".isReportReason")));
         }
     }

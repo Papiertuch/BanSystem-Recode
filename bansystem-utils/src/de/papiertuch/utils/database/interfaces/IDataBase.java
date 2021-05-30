@@ -15,7 +15,7 @@ public interface IDataBase {
 
     public void setReason(UUID uuid, String reason);
 
-    public void setDate(UUID uuid, long date);
+    public void setDate(UUID uuid, String date);
 
     public void setOperator(UUID uuid, String name);
 
@@ -37,7 +37,7 @@ public interface IDataBase {
 
     public boolean isBanned(UUID uuid);
 
-    public boolean isIpBanned(UUID uuid);
+    public boolean isIpBanned(String address);
 
     public String getReason(UUID uuid);
 
@@ -63,7 +63,7 @@ public interface IDataBase {
 
     public void setReasonAsync(UUID uuid, String reason);
 
-    public void setDateAsync(UUID uuid, long date);
+    public void setDateAsync(UUID uuid, String date);
 
     public void setOperatorAsync(UUID uuid, String name);
 
@@ -85,7 +85,7 @@ public interface IDataBase {
 
     public void isBannedAsync(UUID uuid, Consumer<Boolean> consumer);
 
-    public void isIpBannedAsync(UUID uuid, Consumer<Boolean> consumer);
+    public void isIpBannedAsync(String address, Consumer<Boolean> consumer);
 
     public void getReasonAsync(UUID uuid, Consumer<String> consumer);
 

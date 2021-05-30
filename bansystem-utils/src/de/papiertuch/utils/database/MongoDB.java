@@ -57,11 +57,11 @@ public class MongoDB implements IDataBase, IPlayerDataBase {
     }
 
 
-    public Document getDocument(UUID uuid) {
+    private Document getDocument(UUID uuid) {
         return this.collection.find(Filters.eq("_id", uuid.toString())).first();
     }
 
-    public void getDocumentAsync(UUID uuid, Consumer<Document> consumer) {
+    private void getDocumentAsync(UUID uuid, Consumer<Document> consumer) {
         this.executorService.execute(() -> consumer.accept(getDocument(uuid)));
     }
 
@@ -112,7 +112,7 @@ public class MongoDB implements IDataBase, IPlayerDataBase {
     }
 
     @Override
-    public void setDate(UUID uuid, long date) {
+    public void setDate(UUID uuid, String date) {
         setValue(uuid, "date", date);
     }
 
@@ -167,8 +167,9 @@ public class MongoDB implements IDataBase, IPlayerDataBase {
     }
 
     @Override
-    public boolean isIpBanned(UUID uuid) {
-        return getDocument(uuid).getBoolean("ipBanned");
+    public boolean isIpBanned(String address) {
+        //TODO
+        return false;
     }
 
     @Override
@@ -232,7 +233,7 @@ public class MongoDB implements IDataBase, IPlayerDataBase {
     }
 
     @Override
-    public void setDateAsync(UUID uuid, long date) {
+    public void setDateAsync(UUID uuid, String date) {
         this.executorService.execute(() -> setDate(uuid, date));
     }
 
@@ -287,8 +288,8 @@ public class MongoDB implements IDataBase, IPlayerDataBase {
     }
 
     @Override
-    public void isIpBannedAsync(UUID uuid, Consumer<Boolean> consumer) {
-        this.executorService.execute(() -> consumer.accept(isIpBanned(uuid)));
+    public void isIpBannedAsync(String address, Consumer<Boolean> consumer) {
+        //TODO
     }
 
     @Override

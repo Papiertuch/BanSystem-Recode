@@ -18,6 +18,7 @@ import okhttp3.Response;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.UUID;
 import java.util.function.Consumer;
@@ -35,10 +36,10 @@ public class BanHandler {
         this.cache = new HashMap<>();
     }
 
-    public void hasVPN(String address, Consumer<Boolean> consumer) {
+    public boolean hasVPN(String address) {
         try {
             if (this.cache.containsKey(address)) {
-                consumer.accept(this.cache.get(address));
+                return this.cache.get(address);
             }
             int block;
             OkHttpClient caller = new OkHttpClient();
@@ -49,23 +50,23 @@ public class BanHandler {
                 JSONObject json = new JSONObject(response.body().string());
                 block = (int) json.get("block");
                 if (block == 1) {
-                    consumer.accept(this.cache.put(address, true));
+                    return this.cache.put(address, true);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            consumer.accept(this.cache.put(address, false));
+            return this.cache.put(address, false);
         } catch (JSONException e) {
             ProxyServer.getInstance().getConsole().sendMessage("[BanSystem] §cNo VPN key was found...");
         }
-        consumer.accept(false);
+        return false;
     }
 
     public boolean banPlayer(IBanPlayer banPlayer, String name, String reason) {
-        return banPlayer(banPlayer, name, reason, getDurationLong(reason));
+        return banPlayer(banPlayer, name, reason, getReason(reason).getDuration());
     }
 
-    public boolean banPlayer(IBanPlayer banPlayer, String name, String reason, long duration) {
+    public boolean banPlayer(IBanPlayer banPlayer, String name, String reason, String duration, String... info) {
         UUID uuid = BanSystem.getInstance().getUuidFetcher().getUUID(name);
         if (banPlayer.getName().equalsIgnoreCase(name)) {
             banPlayer.sendMessage("§cDu kannst dich nicht bannen");
@@ -101,44 +102,96 @@ public class BanHandler {
             }
         }
         long banTime;
-        if (duration != -1) {
-            banTime = duration + System.currentTimeMillis();
+        if (!duration.equalsIgnoreCase("-1")) {
+            banTime = getDurationLong(duration) + System.currentTimeMillis();
         }
         if (dataBase.getBanPoints(uuid) >= 100) {
             banTime = -1;
         }
+
+        Reason reasonObject = getReason(reason);
+        if (reasonObject == null) {
+            reasonObject = new Reason(reason, 0, duration, 10, false);
+        }
+
         IBanPlayer target = BanSystem.getInstance().getBanPlayer(uuid);
         String display = target == null ? "§7" + name : target.getDisplayName();
+
         for (IBanPlayer teamPlayers : BanSystem.getInstance().getNotify()) {
             if (teamPlayers != null) {
                 teamPlayers.sendMessage(display + " §7wurde von " + banPlayer.getDisplayName() + " §7gebannt");
-                teamPlayers.sendMessage("§7Grund: §e" + getExactReason(reason) + " §7| Dauer: §e" + getDuration(reason));
+                teamPlayers.sendMessage("§7Grund: §e" + reasonObject.getName() + " §7| Dauer: §e" + reasonObject.getDuration());
             }
         }
+        dataBase.addHistoryAsync(uuid, reasonObject.getName(), banPlayer.getName());
+        if (info.length == 1) {
+            dataBase.setBanInfoAsync(uuid, info[0]);
+            dataBase.editLastHistoryAsync(uuid, "banInfo", info[0]);
+        }
+        dataBase.addBanPointsAsync(uuid, reasonObject.getPoints());
+        dataBase.setReasonAsync(uuid, reasonObject.getName());
+        dataBase.setBannedAsync(uuid, true);
+        dataBase.setDateAsync(uuid, BanSystem.getInstance().getDateFormat().format(new Date()));
+        dataBase.setOperatorAsync(uuid, banPlayer.getName());
+
+        if (target != null) {
+            dataBase.setAddressAsync(uuid, target.getAddress());
+            dataBase.setIpBannedAsync(uuid, true);
+            target.disconnect("Du bist gebannt...");
+        }
+
+        return true;
+    }
+
+    public boolean unbanPlayer(IBanPlayer banPlayer, String name) {
+        UUID uuid = BanSystem.getInstance().getUuidFetcher().getUUID(name);
+        if (banPlayer.getName().equalsIgnoreCase(name)) {
+            banPlayer.sendMessage("§cDu kannst dich nicht entbannen");
+            return false;
+        }
+        if (dataBase.isExists(uuid) && !dataBase.isBanned(uuid)) {
+            banPlayer.sendMessage("§cDieser Spieler ist nicht gebannt");
+            return false;
+        }
+
+        IBanPlayer target = BanSystem.getInstance().getBanPlayer(uuid);
+        String display = target == null ? "§7" + name : target.getDisplayName();
+
+        for (IBanPlayer teamPlayers : BanSystem.getInstance().getNotify()) {
+            if (teamPlayers != null) {
+                teamPlayers.sendMessage(display + " §7wurde von " + banPlayer.getDisplayName() + " §7entbannt");
+            }
+        }
+
+        dataBase.removeBanPointsAsync(uuid, getReason(dataBase.getReason(uuid)).getPoints());
+        dataBase.setBannedAsync(uuid, false);
+        dataBase.setIpBannedAsync(uuid, false);
+        dataBase.setDurationAsync(uuid, 0);
+        dataBase.setReasonAsync(uuid, "");
+        dataBase.setOperatorAsync(uuid, "");
+        dataBase.setDateAsync(uuid, "");
+        dataBase.setBanInfoAsync(uuid, "");
+        dataBase.editLastHistoryAsync(uuid, "unban", banPlayer.getName() + "-" + BanSystem.getInstance().getDateFormat().format(new Date()));
         return true;
     }
 
     public long getDurationLong(String string) {
         String format = "";
         long duration = 0;
-        long time = 0;
+        long time = -1;
         for (Reason reason : BanSystem.getInstance().getBanReason()) {
             format = reason.getDuration();
             if (reason.getName().equalsIgnoreCase(string)) {
-                if (reason.getDuration().equalsIgnoreCase("-1")) {
-                    duration = -1;
+                if (!reason.getDuration().equalsIgnoreCase("-1")) {
+                    duration = Long.parseLong(format.split(" ")[0]);
                     break;
                 }
-                duration = Long.parseLong(format.split(" ")[0]);
-                break;
             }
             if (String.valueOf(reason.getId()).equalsIgnoreCase(string)) {
-                if (reason.getDuration().equalsIgnoreCase("-1")) {
-                    duration = -1;
+                if (!reason.getDuration().equalsIgnoreCase("-1")) {
+                    duration = Long.parseLong(format.split(" ")[0]);
                     break;
                 }
-                duration = Long.parseLong(format.split(" ")[0]);
-                break;
             }
         }
         if (format.contains("s")) {
@@ -153,27 +206,15 @@ public class BanHandler {
         return time;
     }
 
-    public String getExactReason(String string) {
+    public Reason getReason(String string) {
         for (Reason reason : BanSystem.getInstance().getBanReason()) {
             if (reason.getName().equalsIgnoreCase(string)) {
-                return reason.getName();
+                return reason;
             }
             if (String.valueOf(reason.getId()).equalsIgnoreCase(string)) {
-                return reason.getName();
+                return reason;
             }
         }
-        return "null";
-    }
-
-    public String getDuration(String string) {
-        for (Reason reason : BanSystem.getInstance().getBanReason()) {
-            if (reason.getName().equalsIgnoreCase(string)) {
-                return reason.getDuration();
-            }
-            if (String.valueOf(reason.getId()).equalsIgnoreCase(string)) {
-                return reason.getDuration();
-            }
-        }
-        return "null";
+        return null;
     }
 }

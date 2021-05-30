@@ -104,7 +104,7 @@ public class MySQL implements IDataBase, IPlayerDataBase {
     }
 
     @Override
-    public void setDate(UUID uuid, long date) {
+    public void setDate(UUID uuid, String date) {
         setValue(uuid, "date", date);
     }
 
@@ -159,8 +159,9 @@ public class MySQL implements IDataBase, IPlayerDataBase {
     }
 
     @Override
-    public boolean isIpBanned(UUID uuid) {
-        return (boolean) getValue(uuid, "ipBanned");
+    public boolean isIpBanned(String address) {
+        //TODO
+        return false;
     }
 
     @Override
@@ -224,7 +225,7 @@ public class MySQL implements IDataBase, IPlayerDataBase {
     }
 
     @Override
-    public void setDateAsync(UUID uuid, long date) {
+    public void setDateAsync(UUID uuid, String date) {
         this.executorService.execute(() -> setDate(uuid, date));
     }
 
@@ -279,8 +280,8 @@ public class MySQL implements IDataBase, IPlayerDataBase {
     }
 
     @Override
-    public void isIpBannedAsync(UUID uuid, Consumer<Boolean> consumer) {
-        this.executorService.execute(() -> consumer.accept(isIpBanned(uuid)));
+    public void isIpBannedAsync(String address, Consumer<Boolean> consumer) {
+     //TODO
     }
 
     @Override

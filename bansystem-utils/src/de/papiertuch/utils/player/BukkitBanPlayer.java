@@ -21,6 +21,11 @@ public class BukkitBanPlayer implements IBanPlayer {
     }
 
     @Override
+    public void disconnect(String string) {
+        player.kickPlayer(string);
+    }
+
+    @Override
     public String getName() {
         return player.getName();
     }
@@ -38,6 +43,11 @@ public class BukkitBanPlayer implements IBanPlayer {
     @Override
     public String getServer() {
         return player.getWorld().getName();
+    }
+
+    @Override
+    public String getAddress() {
+        return player.getAddress().getHostString();
     }
 
     @Override
