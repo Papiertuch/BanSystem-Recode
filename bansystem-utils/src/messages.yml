@@ -1,4 +1,28 @@
 messages:
-  prefix: '§aBanSystem §8» §7'
-  reportPrefix: '§eReport §» §7'
+  prefix: '§aBanSystem §8»'
+  reportPrefix: '§eReport §»'
   noPerms: '%prefix% §cYou have no right to do this'
+  timeFormat:
+    permanent: '§cPermanent'
+    days: 'Days'
+    day: 'Day'
+    hours: 'hours'
+    hour: 'hour'
+    minutes: 'minutes'
+    minute: 'minute'
+    lessMinute: 'less than a minute'
+  notify:
+    ban:
+      - '%prefix% §c%target% §fwas banned by §a%player%'
+      - '%prefix% §fReason §8» §a%reason%'
+      - '%prefix% §fRemaining time §8» §a%duration%'
+  screen:
+    ban:
+      - ''
+      - '§cYou have been banned from yourserver.com'
+      - ''
+      - '§fReason §8» §a%reason%'
+      - '§fRemaining time §8» §a%duration%'
+      - ''
+      - '§eMake a request for suspension at §nyourserver.com/appeal'
+      - ''

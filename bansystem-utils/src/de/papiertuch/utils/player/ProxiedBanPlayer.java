@@ -53,6 +53,7 @@ public class ProxiedBanPlayer implements IBanPlayer {
 
     @Override
     public boolean hasPermission(String permission) {
+        System.out.println(player.getName() + " -> hasPermission -> " + permission + " | " + player.hasPermission(permission));
         return player.hasPermission(permission);
     }
 }

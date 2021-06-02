@@ -28,30 +28,30 @@ public class UUIDFetcher {
         if (BanSystem.getInstance().getConfig().getBoolean("module.cloudNet.v2")) {
             OfflinePlayer offlinePlayer = CloudAPI.getInstance().getOfflinePlayer(name);
             if (offlinePlayer != null) {
-                return cache.put(name, offlinePlayer.getUniqueId());
+                cache.put(name, offlinePlayer.getUniqueId());
+                return cache.get(name);
             }
         }
         if (BanSystem.getInstance().getConfig().getBoolean("module.cloudNet.v3")) {
             ICloudOfflinePlayer offlinePlayer = CloudNetDriver.getInstance().getServicesRegistry().getFirstService(IPlayerManager.class).getFirstOfflinePlayer(name);
             if (offlinePlayer != null) {
-                return cache.put(name, offlinePlayer.getUniqueId());
+                cache.put(name, offlinePlayer.getUniqueId());
+                return cache.get(name);
             }
         }
         try {
             URLConnection urlConnection = new URL("https://api.minetools.eu/uuid/" + name).openConnection();
-            urlConnection.setReadTimeout(3000);
+            urlConnection.setReadTimeout(2000);
             String uuidAsString = new JsonParser().parse(new InputStreamReader(urlConnection.getInputStream()))
                     .getAsJsonObject().get("id").toString().replace("\"", "");
 
-            if (uuidAsString.equals("null"))
-                return UUID.fromString("0-0-0-0-0");
-
-            return cache.put(name, UUID.fromString(new StringBuffer(uuidAsString)
+            cache.put(name, UUID.fromString(new StringBuffer(uuidAsString)
                     .insert(8, "-")
                     .insert(13, "-")
                     .insert(18, "-")
                     .insert(23, "-")
                     .toString()));
+            return cache.get(name);
         } catch (Exception e) {
             System.out.println("[BanSystem] failed fetch uuid of " + name + " this player no exists");
         }

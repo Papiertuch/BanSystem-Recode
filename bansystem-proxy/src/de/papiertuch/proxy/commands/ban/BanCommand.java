@@ -21,7 +21,7 @@ public class BanCommand extends Command {
             return;
         }
         ProxiedPlayer player = (ProxiedPlayer) commandSender;
-        if (!player.hasPermission("system.ban")) {
+        if (!player.hasPermission("bungeecord.command.list")) {
             player.sendMessage("Keine Rechte");
             return;
         }
@@ -38,9 +38,9 @@ public class BanCommand extends Command {
                     return;
                 }
                 if (BanSystem.getInstance().getBanHandler().banPlayer(BanSystem.getInstance().getBanPlayer(player.getUniqueId()), name, reason)) {
-                    ProxyServer.getInstance().getPluginManager().callEvent(new ProxiedPlayerBanEvent(player.getUniqueId(),
-                            name, reason,
-                            BanSystem.getInstance().getBanHandler().getDurationLong(reason)));
+                    ProxyServer.getInstance().getPluginManager().callEvent(new ProxiedPlayerBanEvent(BanSystem.getInstance().getBanPlayer(player.getUniqueId()),
+                            BanSystem.getInstance().getUuidFetcher().getUUID(name),
+                            BanSystem.getInstance().getBanHandler().getReason(reason)));
                 }
                 break;
             default:

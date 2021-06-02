@@ -3,10 +3,9 @@ package de.papiertuch.utils.handler;
 import de.papiertuch.utils.BanSystem;
 import de.papiertuch.utils.config.Config;
 import de.papiertuch.utils.database.MongoDB;
+import de.papiertuch.utils.database.MySQL;
 import de.papiertuch.utils.database.interfaces.IDataBase;
 import lombok.Getter;
-
-import java.util.HashMap;
 import java.util.UUID;
 
 public class MuteHandler {
@@ -16,7 +15,14 @@ public class MuteHandler {
     private Config config;
 
     public MuteHandler() {
-        this.dataBase = new MongoDB("muteData", "nachhilfemc.de", 27017, "test", "mongo", "fyUMRnZV5nRevsFS");
+        switch (BanSystem.getInstance().getConfig().getString("database.type")) {
+            case "MongoDB":
+                this.dataBase = new MongoDB("muteTest", "nachhilfemc.de", 27017, "admin", "mongo", "fyUMRnZV5nRevsFS");
+                break;
+            default:
+                this.dataBase = new MongoDB("muteTest", "nachhilfemc.de", 27017, "admin", "mongo", "fyUMRnZV5nRevsFS");
+                break;
+        }
         this.config = BanSystem.getInstance().getConfig();
     }
 

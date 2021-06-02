@@ -2,6 +2,7 @@ package de.papiertuch.utils;
 
 import de.papiertuch.utils.config.Config;
 import de.papiertuch.utils.database.MongoDB;
+import de.papiertuch.utils.database.MySQL;
 import de.papiertuch.utils.database.interfaces.IDataBase;
 import de.papiertuch.utils.database.interfaces.IPlayerDataBase;
 import de.papiertuch.utils.handler.BanHandler;
@@ -15,7 +16,10 @@ import java.io.InputStream;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 @Getter
@@ -26,7 +30,6 @@ public class BanSystem {
 
     private String version;
 
-    private IDataBase muteDataBase;
     private IPlayerDataBase playerDataBase;
     private Config config, messages, blacklist;
     private UUIDFetcher uuidFetcher;
@@ -55,27 +58,22 @@ public class BanSystem {
         System.out.println("> Software: " + software);
         System.out.println("> Pluginversion: " + currentVersion);
 
-        this.version = checkUpdate();
+       this.version =  checkUpdate();
+       if (!this.version.equalsIgnoreCase(currentVersion)) {
+           System.out.println("[BanSystem] A new version is available: " + this.version);
+           System.out.println("[BanSystem] Download: https://www.spigotmc.org/resources/bansystem-for-bungeecord-or-bukkit-mysql.57979/");
+       }
 
-        if (!this.version.equalsIgnoreCase(currentVersion)) {
-            System.out.println("[BanSystem] A new version is available: " + this.version);
-            System.out.println("[BanSystem] Download: https://www.spigotmc.org/resources/bansystem-for-bungeecord-or-bukkit-mysql.57979/");
-        }
+        this.dateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm");
+
+        this.config = new Config("config.yml");
+        this.messages = new Config("messages.yml");
+        this.blacklist = new Config("blacklist.yml");
 
         this.uuidFetcher = new UUIDFetcher();
         this.banHandler = new BanHandler();
         this.muteHandler = new MuteHandler();
         this.reportHandler = new ReportHandler();
-
-        this.dateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm");
-
-        //TODO CHECK DB TYPE
-        this.muteDataBase = new MongoDB("muteData", "nachhilfemc.de", 27017, "test", "mongo", "fyUMRnZV5nRevsFS");
-        this.playerDataBase = new MongoDB("playerData", "nachhilfemc.de", 27017, "test", "mongo", "fyUMRnZV5nRevsFS");
-
-        this.config = new Config("config.yml");
-        this.messages = new Config("messages.yml");
-        this.blacklist = new Config("blacklist.yml");
 
         this.banPlayerHashMap = new HashMap<>();
         this.accounts = new HashMap<>();
@@ -83,6 +81,15 @@ public class BanSystem {
         this.banReason = new ArrayList<>();
         this.muteReason = new ArrayList<>();
         this.notify = new ArrayList<>();
+
+        switch (BanSystem.getInstance().getConfig().getString("database.type")) {
+            case "MongoDB":
+                this.playerDataBase = new MongoDB("playerTest", "nachhilfemc.de", 27017, "admin", "mongo", "fyUMRnZV5nRevsFS");
+                break;
+            default:
+                this.playerDataBase = new MongoDB("playerTest", "nachhilfemc.de", 27017, "admin", "mongo", "fyUMRnZV5nRevsFS");
+                break;
+        }
 
         for (int i = 1; i < (config.getInt("settings.banReasons") + 1); i++) {
             this.banReason.add(new Reason(
@@ -101,8 +108,9 @@ public class BanSystem {
         }
     }
 
-    public void loadBanPlayer(IBanPlayer banPlayer) {
+    public IBanPlayer loadBanPlayer(IBanPlayer banPlayer) {
         this.banPlayerHashMap.put(banPlayer.getUniqueId(), banPlayer);
+        return banPlayer;
     }
 
     public IBanPlayer getBanPlayer(UUID uuid) {
@@ -121,5 +129,49 @@ public class BanSystem {
             System.out.println("[BanSystem] No connection to the WebServer could be established, you will not receive update notifications");
         }
         return "null";
+    }
+
+    public String getRemainingTime(Long duration) {
+        if (duration == -1) {
+            return this.messages.getString("messages.timeFormat.permanent");
+        }
+        SimpleDateFormat today = new SimpleDateFormat("dd.MM.yyyy");
+        today.format(System.currentTimeMillis() - TimeUnit.MINUTES.toMillis(1));
+
+        SimpleDateFormat future = new SimpleDateFormat("dd.MM.yyyy");
+        future.format(duration);
+
+        long time = future.getCalendar().getTimeInMillis() - today.getCalendar().getTimeInMillis();
+        int days = (int) (time / (1000 * 60 * 60 * 24));
+        int hours = (int) (time / (1000 * 60 * 60) % 24);
+        int minutes = (int) (time / (1000 * 60) % 60);
+
+        String day = this.messages.getString("messages.timeFormat.days");
+        if (days == 1) {
+            day = this.messages.getString("messages.timeFormat.day");
+        }
+
+        String hour = this.messages.getString("messages.timeFormat.hours");
+        if (hours == 1) {
+            hour = this.messages.getString("messages.timeFormat.hour");
+        }
+
+        String minute = this.messages.getString("messages.timeFormat.minutes");
+        if (minutes == 1) {
+            minute = this.messages.getString("messages.timeFormat.minute");
+        }
+        if (minutes < 1 && days == 0 && hours == 0) {
+            return this.messages.getString("messages.timeFormat.lessMinute");
+        }
+        if (hours == 0 && days == 0) {
+            return minutes + " " + minute;
+        }
+        if (days == 0) {
+            return hours + " " + hour + " " + minutes + " " + minute;
+        }
+        if (hours == 0 && minutes == 0) {
+            return days + " " + day;
+        }
+        return days + " " + day + " " + hours + " " + hour + " " + minutes + " " + minute;
     }
 }

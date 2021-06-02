@@ -17,7 +17,7 @@ public class PostLoginListener implements Listener {
         ProxiedPlayer player = event.getPlayer();
         BanSystem.getInstance().loadBanPlayer(new ProxiedBanPlayer(player));
         ProxyServer.getInstance().getScheduler().schedule(ProxyCore.getInstance(), () -> {
-            if (player.hasPermission("system.notify")) {
+            if (player.hasPermission("bungeecord.command.list")) {
                 BanSystem.getInstance().getPlayerDataBase().isNotifyAsync(player.getUniqueId(), state -> {
                     if (state) {
                         if (!BanSystem.getInstance().getNotify().contains(BanSystem.getInstance().getBanPlayer(player.getUniqueId()))) {

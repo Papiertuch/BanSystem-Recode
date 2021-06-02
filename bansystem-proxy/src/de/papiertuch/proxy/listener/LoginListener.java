@@ -1,7 +1,9 @@
 package de.papiertuch.proxy.listener;
 
 import de.papiertuch.proxy.ProxyCore;
+import de.papiertuch.proxy.events.ban.ProxiedPlayerBanEvent;
 import de.papiertuch.utils.BanSystem;
+import de.papiertuch.utils.Reason;
 import de.papiertuch.utils.database.interfaces.IDataBase;
 import de.papiertuch.utils.player.ProxiedCommandSender;
 import net.md_5.bungee.api.ProxyServer;
@@ -30,9 +32,11 @@ public class LoginListener implements Listener {
             UUID uuid = event.getConnection().getUniqueId();
             String address = event.getConnection().getAddress().getHostString();
 
-            BanSystem.getInstance().getBanHandler().getDataBase().createAsync(uuid);
-            BanSystem.getInstance().getMuteDataBase().createAsync(uuid);
-            BanSystem.getInstance().getPlayerDataBase().createPlayerAsync(uuid);
+            BanSystem.getInstance().getBanHandler().getDataBase().create(uuid);
+            BanSystem.getInstance().getMuteHandler().getDataBase().create(uuid);
+            BanSystem.getInstance().getPlayerDataBase().createPlayer(uuid);
+
+            BanSystem.getInstance().getBanHandler().getDataBase().setAddress(uuid, address);
 
             if (BanSystem.getInstance().getConfig().getBoolean("module.antiBot.enable")) {
                 if (BanSystem.getInstance().getAccounts().containsKey(address)) {
@@ -57,18 +61,19 @@ public class LoginListener implements Listener {
                 if (duration != -1 && duration <= System.currentTimeMillis()) {
                     BanSystem.getInstance().getBanHandler().resetBan(uuid);
                 } else {
-                    event.setCancelReason("Ban Screen");
+                    event.setCancelReason(BanSystem.getInstance().getBanHandler().getBanScreen(dataBase.getReason(uuid), dataBase.getDuration(uuid)));
                     event.setCancelled(true);
                 }
-            }
-            if (dataBase.isIpBanned(address)) {
-                BanSystem.getInstance().getBanHandler().banPlayer(new ProxiedCommandSender(ProxyServer.getInstance().getConsole()), event.getConnection().getName(), "Bannumgehung");
-                event.setCancelReason("Ban Screen");
+            } else if (dataBase.isIpBanned(address)) {
+                Reason reason = ProxyCore.getInstance().getBanBypassingReason();
+                if (BanSystem.getInstance().getBanHandler().banPlayer(new ProxiedCommandSender(ProxyServer.getInstance().getConsole()), event.getConnection().getName(), reason.getName(), reason.getDuration())) {
+                    ProxyServer.getInstance().getPluginManager().callEvent(new ProxiedPlayerBanEvent(ProxyCore.getInstance().getConsolePlayer(),
+                            uuid, reason));
+                }
+                event.setCancelReason(BanSystem.getInstance().getBanHandler().getBanScreen(dataBase.getReason(uuid), dataBase.getDuration(uuid)));
                 event.setCancelled(true);
             }
+            event.completeIntent(ProxyCore.getInstance());
         });
-
-        event.completeIntent(ProxyCore.getInstance());
-
     }
 }

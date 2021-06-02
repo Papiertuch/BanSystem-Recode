@@ -6,6 +6,9 @@
       <element id="module-output" name="bansystem-proxy" />
       <element id="module-output" name="bansystem-bukkit" />
       <element id="extracted-dir" path="$PROJECT_DIR$/dependencies/mongo-java-driver-3.12.2.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/dependencies/json-20180813.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/dependencies/okhttp-3.10.0.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/dependencies/okio-1.14.0.jar" path-in-jar="/" />
     </root>
   </artifact>
 </component>

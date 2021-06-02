@@ -15,5 +15,6 @@ public class PlayerDisconnectListener implements Listener {
         if (BanSystem.getInstance().getNotify().contains(banPlayer)) {
             BanSystem.getInstance().getNotify().remove(banPlayer);
         }
+        BanSystem.getInstance().getBanPlayerHashMap().remove(event.getPlayer().getUniqueId());
     }
 }

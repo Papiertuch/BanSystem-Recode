@@ -9,10 +9,8 @@ import de.papiertuch.utils.BanSystem;
 import de.papiertuch.utils.database.interfaces.IDataBase;
 import de.papiertuch.utils.database.interfaces.IPlayerDataBase;
 import org.bson.Document;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.UUID;
+
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Consumer;
@@ -50,7 +48,7 @@ public class MongoDB implements IDataBase, IPlayerDataBase {
         try {
             credential = MongoCredential.createScramSha256Credential(user, dataBase, password.toCharArray());
             clientOptions = MongoClientOptions.builder().build();
-            client = new MongoClient(new ServerAddress(host, port), Collections.singletonList(credential), clientOptions);
+            client = new MongoClient(new ServerAddress(host, port), Arrays.asList(credential), clientOptions);
             mongoDatabase = client.getDatabase(dataBase);
             System.out.println("[BanSystem] The connection to the MongoDB server was successful");
         } catch (Exception ex) {
@@ -65,7 +63,7 @@ public class MongoDB implements IDataBase, IPlayerDataBase {
     }
 
     public void setValue(UUID uuid, String type, Object value) {
-        collection.updateOne(Filters.eq("_id", uuid), new Document("$set", new Document(type, value)));
+        this.collection.updateOne(Filters.eq("_id", uuid.toString()), new Document("$set", new Document(type, value)));
     }
 
     @Override
@@ -80,7 +78,7 @@ public class MongoDB implements IDataBase, IPlayerDataBase {
 
     @Override
     public void create(UUID uuid) {
-        if (getDocument(uuid) == null) return;
+        if (getDocument(uuid) != null) return;
         Document document = new Document();
         document.put("_id", uuid.toString());
         document.put("address", "");
@@ -353,7 +351,7 @@ public class MongoDB implements IDataBase, IPlayerDataBase {
 
     @Override
     public void createPlayer(UUID uuid) {
-        if (getDocument(uuid) == null) return;
+        if (getDocument(uuid) != null) return;
         Document document = new Document();
         document.put("_id", uuid.toString());
         document.put("notify", true);
