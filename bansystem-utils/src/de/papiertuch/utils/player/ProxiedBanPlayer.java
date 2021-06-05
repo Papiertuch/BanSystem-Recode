@@ -3,7 +3,6 @@ package de.papiertuch.utils.player;
 import de.papiertuch.utils.player.interfaces.IBanPlayer;
 import lombok.Getter;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
-import net.md_5.bungee.api.connection.Server;
 
 import java.util.UUID;
 
@@ -14,6 +13,11 @@ public class ProxiedBanPlayer implements IBanPlayer {
 
     public ProxiedBanPlayer(ProxiedPlayer player) {
         this.player = player;
+    }
+
+    @Override
+    public PlayerType getType() {
+        return PlayerType.PROXIED_PLAYER;
     }
 
     @Override
@@ -53,7 +57,6 @@ public class ProxiedBanPlayer implements IBanPlayer {
 
     @Override
     public boolean hasPermission(String permission) {
-        System.out.println(player.getName() + " -> hasPermission -> " + permission + " | " + player.hasPermission(permission));
         return player.hasPermission(permission);
     }
 }

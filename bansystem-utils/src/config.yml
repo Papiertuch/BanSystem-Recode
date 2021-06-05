@@ -21,6 +21,13 @@ module:
     maxAccounts: 2
     #https://iphub.info/apiKey/newFree Create your own free key
     vpnKey: 'Nzg2OTppa2dhbkJOdVZTZms3ODdHNDdjZzRZclhFNWJPSFdTWg=='
+permissions:
+  banCommand: 'ban.command.ban'
+  unbanCommand: 'ban.command.unban'
+  loginCommand: 'ban.command.login'
+  updateNotify: 'ban.notify.update'
+  banBypass: 'ban.bypass'
+  banEveryone: 'ban.op'
 settings:
   ipBan: true
   banBypassing:

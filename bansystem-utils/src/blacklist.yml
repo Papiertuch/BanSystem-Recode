@@ -1,3 +1,6 @@
 blacklist:
-  - fuck
+  - /plugins
   - /me
+  - bastard
+  - fuck
+  -

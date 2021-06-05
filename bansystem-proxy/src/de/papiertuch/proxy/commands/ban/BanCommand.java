@@ -3,6 +3,7 @@ package de.papiertuch.proxy.commands.ban;
 import de.papiertuch.proxy.events.ban.ProxiedPlayerBanEvent;
 import de.papiertuch.utils.BanSystem;
 import de.papiertuch.utils.Reason;
+import de.papiertuch.utils.player.interfaces.IBanPlayer;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
@@ -17,12 +18,17 @@ public class BanCommand extends Command {
     @Override
     public void execute(CommandSender commandSender, String[] args) {
         if (!(commandSender instanceof ProxiedPlayer)) {
-            commandSender.sendMessage("Kein Spieler");
+            commandSender.sendMessage(BanSystem.getInstance().getMessages().getString("messages.console"));
             return;
         }
         ProxiedPlayer player = (ProxiedPlayer) commandSender;
-        if (!player.hasPermission("bungeecord.command.list")) {
-            player.sendMessage("Keine Rechte");
+        if (!player.hasPermission(BanSystem.getInstance().getConfig().getString("permissions.banCommand"))) {
+            player.sendMessage(BanSystem.getInstance().getMessages().getString("messages.noPerms"));
+            return;
+        }
+        IBanPlayer banPlayer = BanSystem.getInstance().getBanPlayer(player.getUniqueId());
+        if (!BanSystem.getInstance().getNotify().contains(banPlayer)) {
+            player.sendMessage(BanSystem.getInstance().getMessages().getString("messages.notLogin"));
             return;
         }
         switch (args.length) {
@@ -30,21 +36,21 @@ public class BanCommand extends Command {
                 String name = args[0];
                 String reason = args[1];
                 if (name.equalsIgnoreCase(player.getName())) {
-                    player.sendMessage("Darfst dich nicht selber bannen");
+                    player.sendMessage(BanSystem.getInstance().getMessages().getString("messages.selfBanned"));
                     return;
                 }
                 if (!isExists(reason)) {
-                    player.sendMessage("Gibt es nicht");
+                    player.sendMessage(BanSystem.getInstance().getMessages().getString("messages.playerNotExists"));
                     return;
                 }
-                if (BanSystem.getInstance().getBanHandler().banPlayer(BanSystem.getInstance().getBanPlayer(player.getUniqueId()), name, reason)) {
-                    ProxyServer.getInstance().getPluginManager().callEvent(new ProxiedPlayerBanEvent(BanSystem.getInstance().getBanPlayer(player.getUniqueId()),
+                if (BanSystem.getInstance().getBanHandler().banPlayer(banPlayer, name, reason)) {
+                    ProxyServer.getInstance().getPluginManager().callEvent(new ProxiedPlayerBanEvent(banPlayer,
                             BanSystem.getInstance().getUuidFetcher().getUUID(name),
                             BanSystem.getInstance().getBanHandler().getReason(reason)));
                 }
                 break;
             default:
-                player.sendMessage("SYNTAX");
+                player.sendMessage(BanSystem.getInstance().getMessages().getString("messages.banSyntax"));
                 break;
         }
     }

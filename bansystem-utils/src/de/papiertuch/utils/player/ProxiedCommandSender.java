@@ -15,6 +15,11 @@ public class ProxiedCommandSender implements IBanPlayer {
     }
 
     @Override
+    public PlayerType getType() {
+        return PlayerType.CONSOLE;
+    }
+
+    @Override
     public void sendMessage(String message) {
         commandSender.sendMessage(message);
     }

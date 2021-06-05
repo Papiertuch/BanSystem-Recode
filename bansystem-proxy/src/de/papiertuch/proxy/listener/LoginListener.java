@@ -41,7 +41,8 @@ public class LoginListener implements Listener {
             if (BanSystem.getInstance().getConfig().getBoolean("module.antiBot.enable")) {
                 if (BanSystem.getInstance().getAccounts().containsKey(address)) {
                     if (BanSystem.getInstance().getAccounts().get(address).size() >= BanSystem.getInstance().getConfig().getInt("module.antiBot.maxAccounts")) {
-                        event.setCancelReason("Kick Doppel Acc");
+                        event.setCancelReason(BanSystem.getInstance().getMessages().getString("messages.kickAntiBot")
+                                .replace("%amount%", String.valueOf(BanSystem.getInstance().getAccounts().get(address).size())));
                         event.setCancelled(true);
                     }
                     List<UUID> list = BanSystem.getInstance().getAccounts().containsKey(address) ? BanSystem.getInstance().getAccounts().get(address) : new ArrayList<>();
@@ -51,7 +52,8 @@ public class LoginListener implements Listener {
                     }
                 }
                 if (BanSystem.getInstance().getBanHandler().hasVPN(address)) {
-                    event.setCancelReason("Kick VPN");
+                    event.setCancelReason(BanSystem.getInstance().getMessages().getString("messages.kickVpn")
+                            .replace("%address%", address));
                     event.setCancelled(true);
                 }
             }

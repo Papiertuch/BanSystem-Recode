@@ -21,12 +21,12 @@ public class MySQL implements IDataBase, IPlayerDataBase {
     private Connection connection;
     private String table;
 
-    public MySQL(String table, String host, int port, String dataBase, String user, String password) {
-        this.host = host;
-        this.port = port;
-        this.dataBase = dataBase;
-        this.user = user;
-        this.password = password;
+    public MySQL(String table) {
+        this.host = BanSystem.getInstance().getConfig().getString("database.host");
+        this.port = BanSystem.getInstance().getConfig().getInt("database.port");;
+        this.dataBase = BanSystem.getInstance().getConfig().getString("database.dataBase");;
+        this.user = BanSystem.getInstance().getConfig().getString("database.user");;
+        this.password = BanSystem.getInstance().getConfig().getString("database.password");;
         this.table = table;
         this.executorService = Executors.newCachedThreadPool();
         connect();

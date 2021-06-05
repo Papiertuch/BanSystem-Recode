@@ -17,7 +17,7 @@ public class ChatListener implements Listener {
             for (String command : BanSystem.getInstance().getBlacklist().getList("blacklist")) {
                 if (event.getMessage().startsWith(command)) {
                     event.setCancelled(true);
-                    //TODO SEND BLOCK COMMAND MESSAGE
+                    player.sendMessage(BanSystem.getInstance().getMessages().getString("messages.blockCommand"));
                     return;
                 }
             }
@@ -25,7 +25,7 @@ public class ChatListener implements Listener {
         for (String command : BanSystem.getInstance().getBlacklist().getList("blacklist")) {
             if (event.getMessage().contains(command)) {
                 event.setCancelled(true);
-                //TODO SEND MESSAGE BLOCKED
+                player.sendMessage(BanSystem.getInstance().getMessages().getString("messages.blockMessage"));
                 return;
             }
         }
@@ -37,7 +37,7 @@ public class ChatListener implements Listener {
                         return;
                     }
                     event.setCancelled(true);
-                    //TODO SEND MUTE NOTIFY
+                    player.sendMessage(BanSystem.getInstance().getMessages().getListAsString("messages.screen.mute"));
                     return;
                 });
             }

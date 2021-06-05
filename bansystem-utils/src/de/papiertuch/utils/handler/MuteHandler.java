@@ -17,10 +17,10 @@ public class MuteHandler {
     public MuteHandler() {
         switch (BanSystem.getInstance().getConfig().getString("database.type")) {
             case "MongoDB":
-                this.dataBase = new MongoDB("muteTest", "nachhilfemc.de", 27017, "admin", "mongo", "fyUMRnZV5nRevsFS");
+                this.dataBase = new MongoDB("muteTest");
                 break;
             default:
-                this.dataBase = new MongoDB("muteTest", "nachhilfemc.de", 27017, "admin", "mongo", "fyUMRnZV5nRevsFS");
+                this.dataBase = new MySQL("muteTest");
                 break;
         }
         this.config = BanSystem.getInstance().getConfig();

@@ -84,10 +84,10 @@ public class BanSystem {
 
         switch (BanSystem.getInstance().getConfig().getString("database.type")) {
             case "MongoDB":
-                this.playerDataBase = new MongoDB("playerTest", "nachhilfemc.de", 27017, "admin", "mongo", "fyUMRnZV5nRevsFS");
+                this.playerDataBase = new MongoDB("playerTest");
                 break;
             default:
-                this.playerDataBase = new MongoDB("playerTest", "nachhilfemc.de", 27017, "admin", "mongo", "fyUMRnZV5nRevsFS");
+                this.playerDataBase = new MySQL("playerTest");
                 break;
         }
 

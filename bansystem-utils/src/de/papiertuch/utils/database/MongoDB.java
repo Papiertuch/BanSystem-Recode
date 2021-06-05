@@ -29,12 +29,12 @@ public class MongoDB implements IDataBase, IPlayerDataBase {
     private MongoCollection<Document> collection, historyCollection;
 
 
-    public MongoDB(String collection, String host, int port, String dataBase, String user, String password) {
-        this.host = host;
-        this.port = port;
-        this.dataBase = dataBase;
-        this.user = user;
-        this.password = password;
+    public MongoDB(String collection) {
+        this.host = BanSystem.getInstance().getConfig().getString("database.host");
+        this.port = BanSystem.getInstance().getConfig().getInt("database.port");;
+        this.dataBase = BanSystem.getInstance().getConfig().getString("database.dataBase");;
+        this.user = BanSystem.getInstance().getConfig().getString("database.user");;
+        this.password = BanSystem.getInstance().getConfig().getString("database.password");;
 
         connect();
 

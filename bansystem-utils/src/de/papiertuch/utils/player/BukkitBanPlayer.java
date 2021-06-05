@@ -16,6 +16,11 @@ public class BukkitBanPlayer implements IBanPlayer {
     }
 
     @Override
+    public PlayerType getType() {
+        return PlayerType.BUKKIT_PLAYER;
+    }
+
+    @Override
     public void sendMessage(String message) {
         player.sendMessage(message);
     }
