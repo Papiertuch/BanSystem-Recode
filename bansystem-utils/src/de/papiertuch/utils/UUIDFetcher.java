@@ -6,6 +6,7 @@ import de.dytanic.cloudnet.driver.CloudNetDriver;
 import de.dytanic.cloudnet.ext.bridge.player.ICloudOfflinePlayer;
 import de.dytanic.cloudnet.ext.bridge.player.IPlayerManager;
 import de.dytanic.cloudnet.lib.player.OfflinePlayer;
+import lombok.Getter;
 
 import java.io.InputStreamReader;
 import java.net.URL;
@@ -15,6 +16,7 @@ import java.util.UUID;
 
 public class UUIDFetcher {
 
+    @Getter
     private HashMap<String, UUID> cache;
 
     public UUIDFetcher() {

@@ -1,5 +1,6 @@
 package de.papiertuch.utils.player;
 
+import de.papiertuch.utils.BanSystem;
 import de.papiertuch.utils.player.interfaces.IBanPlayer;
 import lombok.Getter;
 import org.bukkit.entity.Player;
@@ -13,6 +14,7 @@ public class BukkitBanPlayer implements IBanPlayer {
 
     public BukkitBanPlayer(Player player) {
         this.player = player;
+        BanSystem.getInstance().getUuidFetcher().getCache().put(player.getName(), player.getUniqueId());
     }
 
     @Override

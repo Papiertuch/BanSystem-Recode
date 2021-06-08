@@ -6,8 +6,8 @@ import de.papiertuch.utils.database.interfaces.IPlayerDataBase;
 import org.bson.Document;
 
 import java.sql.*;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -23,10 +23,10 @@ public class MySQL implements IDataBase, IPlayerDataBase {
 
     public MySQL(String table) {
         this.host = BanSystem.getInstance().getConfig().getString("database.host");
-        this.port = BanSystem.getInstance().getConfig().getInt("database.port");;
-        this.dataBase = BanSystem.getInstance().getConfig().getString("database.dataBase");;
-        this.user = BanSystem.getInstance().getConfig().getString("database.user");;
-        this.password = BanSystem.getInstance().getConfig().getString("database.password");;
+        this.port = BanSystem.getInstance().getConfig().getInt("database.port");
+        this.dataBase = BanSystem.getInstance().getConfig().getString("database.dataBase");
+        this.user = BanSystem.getInstance().getConfig().getString("database.user");
+        this.password = BanSystem.getInstance().getConfig().getString("database.password");
         this.table = table;
         this.executorService = Executors.newCachedThreadPool();
         connect();
@@ -35,15 +35,26 @@ public class MySQL implements IDataBase, IPlayerDataBase {
     private void connect() {
         if (connection != null) return;
         try {
-            this.connection = DriverManager.getConnection("jdbc:mysql://" + host + ":" + port + "/" + dataBase + "?autoReconnect=true", user, password);
+            connection = DriverManager.getConnection("jdbc:mysql://" + this.host + ":" +
+                    this.port + "/" + this.dataBase +
+                    "?autoReconnect=true", this.user, this.password);
             System.out.println("[BanSystem] The connection to the MySQL server was successful");
-        } catch (SQLException ex) {
+/*
+            update("CREATE TABLE IF NOT EXISTS banTest (uuid VARCHAR(64), address VARCHAR(64), banPoints INT, banned BOOL, reason VARCHAR(64), banInfo VARCHAR(64), duration LONG, date VARCHAR(64), operator VARCHAR(64));");
+            update("CREATE TABLE IF NOT EXISTS muteTest (uuid VARCHAR(64), address VARCHAR(64), banPoints INT, banned BOOL, reason VARCHAR(64), banInfo VARCHAR(64), duration LONG, date VARCHAR(64), operator VARCHAR(64));");
+            update("CREATE TABLE IF NOT EXISTS banTestHistory (id VARCHAR(64), uuid VARCHAR(64), user VARCHAR(64), date VARCHAR(64), banInfo VARCHAR(64), reduce VARCHAR(64), unban VARCHAR(64))");
+            update("CREATE TABLE IF NOT EXISTS muteTestHistory (id VARCHAR(64), uuid VARCHAR(64), user VARCHAR(64), date VARCHAR(64), banInfo VARCHAR(64), reduce VARCHAR(64), unban VARCHAR(64))");
+            update("CREATE TABLE IF NOT EXISTS playerTest (uuid VARCHAR(64), notify BOOL);");
+ */
+        } catch (Exception ex) {
             ex.printStackTrace();
             System.out.println("[BanSystem] The connection to the MySQL server failed...");
         }
+
     }
 
     public void update(String query) {
+        if (connection == null) return;
         try (PreparedStatement preparedStatement = this.connection.prepareStatement(query)) {
             preparedStatement.executeUpdate();
         } catch (SQLException ex) {
@@ -61,8 +72,21 @@ public class MySQL implements IDataBase, IPlayerDataBase {
         }
     }
 
+    public Object getValueHistory(String id, String type) {
+        try (PreparedStatement preparedStatement = this.connection.prepareStatement("SELECT * FROM " + table + "History WHERE id = ?")) {
+            preparedStatement.setString(1, id);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                return resultSet.getObject(type);
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        return null;
+    }
+
     public Object getValue(UUID uuid, String type) {
-        try (PreparedStatement preparedStatement = this.connection.prepareStatement("SELECT * FROM " + type + " WHERE uuid = ?")) {
+        try (PreparedStatement preparedStatement = this.connection.prepareStatement("SELECT * FROM " + table + " WHERE uuid = ?")) {
             preparedStatement.setString(1, uuid.toString());
             ResultSet resultSet = preparedStatement.executeQuery();
             if (resultSet.next()) {
@@ -86,8 +110,24 @@ public class MySQL implements IDataBase, IPlayerDataBase {
 
     @Override
     public void create(UUID uuid) {
-        //TODO CREATE
+        if (isExists(uuid)) return;
+        try (PreparedStatement preparedStatement = this.connection.prepareStatement(
+                "INSERT INTO " + table + " (uuid, address, banPoints, banned, reason, banInfo, duration, date, operator) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)")) {
+            preparedStatement.setString(1, uuid.toString());
+            preparedStatement.setString(2, "");
+            preparedStatement.setInt(3, 0);
+            preparedStatement.setBoolean(4, false);
+            preparedStatement.setString(5, "");
+            preparedStatement.setString(6, "");
+            preparedStatement.setLong(7, 0l);
+            preparedStatement.setString(8, "");
+            preparedStatement.setString(9, "");
+            preparedStatement.executeUpdate();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
     }
+
 
     @Override
     public void setBanned(UUID uuid, boolean value) {
@@ -141,17 +181,66 @@ public class MySQL implements IDataBase, IPlayerDataBase {
 
     @Override
     public void addHistory(UUID uuid, String reason, String operator) {
-
+        try (PreparedStatement preparedStatement = this.connection.prepareStatement(
+                "INSERT INTO " + table + "History (id, uuid, reason, user, date, banInfo, reduce, unban) VALUES (?, ?, ?, ?, ?, ?, ?, ?)")) {
+            preparedStatement.setString(1, uuid + "#" + getHistory(uuid).size());
+            preparedStatement.setString(2, uuid.toString());
+            preparedStatement.setString(3, reason);
+            preparedStatement.setString(4, operator);
+            preparedStatement.setString(5, BanSystem.getInstance().getDateFormat().format(new Date()));
+            preparedStatement.setString(6, "");
+            preparedStatement.setString(7, "");
+            preparedStatement.setString(8, "");
+            preparedStatement.executeUpdate();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
     }
 
     @Override
     public void editLastHistory(UUID uuid, String type, String info) {
+        int last = getHistory(uuid).size() - 1;
+        String historyId = uuid.toString() + "#" + last;
 
+        try (PreparedStatement preparedStatement = this.connection.prepareStatement("UPDATE " + table + "History SET " + type + " = ? WHERE id = ?")) {
+            preparedStatement.setObject(1, info);
+            preparedStatement.setString(2, historyId);
+            preparedStatement.executeUpdate();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    public int getHistorySize(UUID uuid) {
+        int i = 0;
+        try (PreparedStatement preparedStatement = this.connection.prepareStatement("SELECT * FROM " + table + " WHERE uuid = ?")) {
+            preparedStatement.setString(1, uuid.toString());
+            ResultSet resultSet = preparedStatement.executeQuery();
+            while (resultSet.next()) {
+                i++;
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        return i;
     }
 
     @Override
     public ArrayList<Document> getHistory(UUID uuid) {
-        return null;
+        ArrayList<Document> list = new ArrayList<>();
+        for (int i = 1; i < getHistorySize(uuid); i++) {
+            String id = uuid + "#" + i;
+            Document document = new Document();
+            document.put("id", id);
+            document.put("uuid", uuid.toString());
+            document.put("reason", getValueHistory(id, "reason"));
+            document.put("date", getValueHistory(id, "date"));
+            document.put("banInfo", getValueHistory(id, "banInfo"));
+            document.put("reduce", getValueHistory(id, "reduce"));
+            document.put("unban", getValueHistory(id, "unban"));
+            list.add(document);
+        }
+        return list;
     }
 
     @Override
@@ -161,7 +250,15 @@ public class MySQL implements IDataBase, IPlayerDataBase {
 
     @Override
     public boolean isIpBanned(String address) {
-        //TODO
+        try (PreparedStatement preparedStatement = this.connection.prepareStatement("SELECT * FROM " + table + "History WHERE address = ?")) {
+            preparedStatement.setString(1, address);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                return resultSet.getBoolean("banned");
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
         return false;
     }
 
@@ -272,7 +369,7 @@ public class MySQL implements IDataBase, IPlayerDataBase {
 
     @Override
     public void getHistoryAsync(UUID uuid, Consumer<ArrayList<Document>> consumer) {
-
+        this.executorService.execute(() -> getHistory(uuid));
     }
 
     @Override
@@ -282,7 +379,7 @@ public class MySQL implements IDataBase, IPlayerDataBase {
 
     @Override
     public void isIpBannedAsync(String address, Consumer<Boolean> consumer) {
-     //TODO
+        this.executorService.execute(() -> isIpBanned(address));
     }
 
     @Override
@@ -327,6 +424,15 @@ public class MySQL implements IDataBase, IPlayerDataBase {
 
     @Override
     public void createPlayer(UUID uuid) {
+        if (isExistsPlayer(uuid)) return;
+        try (PreparedStatement preparedStatement = this.connection.prepareStatement(
+                "INSERT INTO " + table + " (uuid, notify) VALUES (?, ?)")) {
+            preparedStatement.setString(1, uuid.toString());
+            preparedStatement.setBoolean(2, true);
+            preparedStatement.executeUpdate();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
     }
 
     @Override

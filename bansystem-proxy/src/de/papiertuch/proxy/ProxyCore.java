@@ -3,6 +3,8 @@ package de.papiertuch.proxy;
 import de.papiertuch.proxy.commands.KickCommand;
 import de.papiertuch.proxy.commands.LoginCommand;
 import de.papiertuch.proxy.commands.ban.BanCommand;
+import de.papiertuch.proxy.commands.ban.BanPointsCommand;
+import de.papiertuch.proxy.commands.ban.TempBanCommand;
 import de.papiertuch.proxy.commands.ban.UnbanCommand;
 import de.papiertuch.proxy.listener.ChatListener;
 import de.papiertuch.proxy.listener.LoginListener;
@@ -48,5 +50,7 @@ public class ProxyCore extends Plugin {
         pluginManager.registerCommand(this, new UnbanCommand());
         pluginManager.registerCommand(this, new KickCommand());
         pluginManager.registerCommand(this, new LoginCommand());
+        pluginManager.registerCommand(this, new TempBanCommand());
+        pluginManager.registerCommand(this, new BanPointsCommand());
     }
 }

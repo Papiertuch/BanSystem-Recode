@@ -31,7 +31,6 @@ public class BanHandler {
     private HashMap<String, Boolean> cache;
 
     public BanHandler() {
-        System.out.println(BanSystem.getInstance().getConfig().getString("database.type"));
         switch (BanSystem.getInstance().getConfig().getString("database.type")) {
             case "MongoDB":
                 this.dataBase = new MongoDB("banTest");
@@ -44,7 +43,6 @@ public class BanHandler {
         }
         this.config = BanSystem.getInstance().getConfig();
         this.cache = new HashMap<>();
-        System.out.println("finish");
     }
 
     public boolean hasVPN(String address) {
@@ -110,14 +108,15 @@ public class BanHandler {
                     }
                 }
             } else if (target != null && target.hasPermission(BanSystem.getInstance().getConfig().getString("permission.banBypass"))) {
-                System.out.println(target.getName());
                 banPlayer.sendMessage(BanSystem.getInstance().getMessages().getString("messages.cannotBanned"));
                 return false;
             }
         }
         long banTime = -1;
         if (!duration.equalsIgnoreCase("-1")) {
-            banTime = getDurationLong(reason) + System.currentTimeMillis();
+            banTime = getDurationLong(reason, duration) + System.currentTimeMillis();
+        } else {
+            duration = "Permanent";
         }
         if (dataBase.getBanPoints(uuid) >= 100) {
             banTime = -1;
@@ -125,7 +124,7 @@ public class BanHandler {
 
         Reason reasonObject = getReason(reason);
         if (reasonObject == null) {
-            reasonObject = new Reason(reason, 0, duration, 10, false);
+            reasonObject = new Reason(reason, 0, duration, 0, false);
         }
 
         String display = target == null ? name : target.getDisplayName();
@@ -134,7 +133,7 @@ public class BanHandler {
             if (teamPlayers != null) {
                 teamPlayers.sendMessage(BanSystem.getInstance().getMessages().getListAsString("messages.notify.ban")
                         .replace("%reason%", reasonObject.getName())
-                        .replace("%duration%", BanSystem.getInstance().getRemainingTime(banTime))
+                        .replace("%duration%", reasonObject.getDuration())
                         .replace("%target%", display)
                         .replace("%player%", banPlayer.getDisplayName()));
             }
@@ -153,15 +152,41 @@ public class BanHandler {
 
         if (target != null) {
             dataBase.setAddressAsync(uuid, target.getAddress());
-            target.disconnect(getBanScreen(reasonObject.getName(), banTime));
+            target.disconnect(BanSystem.getInstance().getMessages().getListAsString("messages.screen.ban")
+                    .replace("%reason%", reason)
+                    .replace("%duration%", reasonObject.getDuration()));
         }
 
+        return true;
+    }
+
+    public boolean reduceBan(IBanPlayer banPlayer, String name, int reduce) {
+        UUID uuid = BanSystem.getInstance().getUuidFetcher().getUUID(name);
+        if (dataBase.isExists(uuid) && !dataBase.isBanned(uuid)) {
+            banPlayer.sendMessage(BanSystem.getInstance().getMessages().getString("messages.notBanned"));
+            return false;
+        }
+        long duration = (dataBase.getDuration(uuid) / reduce);
+        for (IBanPlayer teamPlayers : BanSystem.getInstance().getNotify()) {
+            if (teamPlayers != null) {
+                teamPlayers.sendMessage(BanSystem.getInstance().getMessages().getListAsString("messages.notify.reduce")
+                        .replace("%target%", name)
+                        .replace("%duration%", String.valueOf(BanSystem.getInstance().getRemainingTime(duration)))
+                        .replace("%player%", banPlayer.getDisplayName()));
+            }
+        }
+        dataBase.setDurationAsync(uuid, duration);
+        dataBase.editLastHistoryAsync(uuid, "reduce", banPlayer.getName() + "-" + BanSystem.getInstance().getDateFormat().format(new Date()));
         return true;
     }
 
     public boolean kickPlayer(IBanPlayer banPlayer, IBanPlayer target, String reason) {
         if (target == null) {
             banPlayer.sendMessage(BanSystem.getInstance().getMessages().getString("messages.isOffline"));
+            return false;
+        }
+        if (target.getName().equalsIgnoreCase(banPlayer.getName())) {
+            banPlayer.sendMessage(BanSystem.getInstance().getMessages().getString("messages.selfKicked"));
             return false;
         }
         if (!banPlayer.hasPermission(BanSystem.getInstance().getConfig().getString("permission.banEveryone"))) {
@@ -212,18 +237,18 @@ public class BanHandler {
             return false;
         }
 
-        IBanPlayer target = BanSystem.getInstance().getBanPlayer(uuid);
-        String display = target == null ? name : target.getDisplayName();
-
         for (IBanPlayer teamPlayers : BanSystem.getInstance().getNotify()) {
             if (teamPlayers != null) {
                 teamPlayers.sendMessage(BanSystem.getInstance().getMessages().getListAsString("messages.notify.unban")
-                        .replace("%target%", display)
+                        .replace("%target%", name)
                         .replace("%player%", banPlayer.getDisplayName()));
             }
         }
+        Reason reason = getReason(dataBase.getReason(uuid));
+        if (reason != null) {
+            dataBase.removeBanPointsAsync(uuid, reason.getPoints());
+        }
 
-        dataBase.removeBanPointsAsync(uuid, getReason(dataBase.getReason(uuid)).getPoints());
         dataBase.setBannedAsync(uuid, false);
         dataBase.setDurationAsync(uuid, 0);
         dataBase.setReasonAsync(uuid, "");
@@ -243,32 +268,29 @@ public class BanHandler {
         dataBase.setBanInfoAsync(uuid, "");
     }
 
-    public long getDurationLong(String string) {
-        String format = "";
-        long duration = 0;
+    public long getDurationLong(String string, String durationString) {
+        long duration = Long.parseLong(durationString.split(" ")[0]);
         long time = -1;
-        for (Reason reason : BanSystem.getInstance().getBanReason()) {
-            format = reason.getDuration();
-            if (reason.getName().equalsIgnoreCase(string)) {
-                if (!reason.getDuration().equalsIgnoreCase("-1")) {
-                    duration = Long.parseLong(format.split(" ")[0]);
-                    break;
-                }
+        Reason reason = getReason(string);
+        if (reason == null) {
+            if (durationString.contains("s")) {
+                time = duration * 1000;
+            } else if (durationString.contains("m")) {
+                time = duration * 1000 * 60;
+            } else if (durationString.contains("h")) {
+                time = duration * 1000 * 60 * 60;
+            } else if (durationString.contains("d")) {
+                time = duration * 1000 * 60 * 60 * 24;
             }
-            if (String.valueOf(reason.getId()).equalsIgnoreCase(string)) {
-                if (!reason.getDuration().equalsIgnoreCase("-1")) {
-                    duration = Long.parseLong(format.split(" ")[0]);
-                    break;
-                }
-            }
+            return time;
         }
-        if (format.contains("s")) {
+        if (reason.getDuration().contains("s")) {
             time = duration * 1000;
-        } else if (format.contains("m")) {
+        } else if (reason.getDuration().contains("m")) {
             time = duration * 1000 * 60;
-        } else if (format.contains("h")) {
+        } else if (reason.getDuration().contains("h")) {
             time = duration * 1000 * 60 * 60;
-        } else if (format.contains("d")) {
+        } else if (reason.getDuration().contains("d")) {
             time = duration * 1000 * 60 * 60 * 24;
         }
         return time;

@@ -31,10 +31,10 @@ public class MongoDB implements IDataBase, IPlayerDataBase {
 
     public MongoDB(String collection) {
         this.host = BanSystem.getInstance().getConfig().getString("database.host");
-        this.port = BanSystem.getInstance().getConfig().getInt("database.port");;
-        this.dataBase = BanSystem.getInstance().getConfig().getString("database.dataBase");;
-        this.user = BanSystem.getInstance().getConfig().getString("database.user");;
-        this.password = BanSystem.getInstance().getConfig().getString("database.password");;
+        this.port = BanSystem.getInstance().getConfig().getInt("database.port");
+        this.dataBase = BanSystem.getInstance().getConfig().getString("database.dataBase");
+        this.user = BanSystem.getInstance().getConfig().getString("database.user");
+        this.password = BanSystem.getInstance().getConfig().getString("database.password");
 
         connect();
 
@@ -52,7 +52,6 @@ public class MongoDB implements IDataBase, IPlayerDataBase {
             mongoDatabase = client.getDatabase(dataBase);
             System.out.println("[BanSystem] The connection to the MongoDB server was successful");
         } catch (Exception ex) {
-            ex.printStackTrace();
             System.out.println("[BanSystem] The connection to the MongoDB server failed...");
         }
     }

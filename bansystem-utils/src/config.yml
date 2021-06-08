@@ -23,8 +23,10 @@ module:
     vpnKey: 'Nzg2OTppa2dhbkJOdVZTZms3ODdHNDdjZzRZclhFNWJPSFdTWg=='
 permissions:
   banCommand: 'ban.command.ban'
+  tempBanCommand: 'ban.command.tempBan'
   unbanCommand: 'ban.command.unban'
   loginCommand: 'ban.command.login'
+  reduceCommand: 'ban.command.reduce'
   updateNotify: 'ban.notify.update'
   banBypass: 'ban.bypass'
   banEveryone: 'ban.op'

@@ -40,7 +40,15 @@ public class BanCommand extends Command {
                     return;
                 }
                 if (!isExists(reason)) {
-                    player.sendMessage(BanSystem.getInstance().getMessages().getString("messages.playerNotExists"));
+                    int i = 0;
+                    for (Reason banReason : BanSystem.getInstance().getBanReason()) {
+                        i++;
+                        player.sendMessage(BanSystem.getInstance().getMessages().getString("messages.banSyntaxReason")
+                                .replace("%reason%", banReason.getName())
+                                .replace("%id%", String.valueOf(i))
+                                .replace("%duration%", banReason.getDuration().replace("-1", "Permanent")));
+                    }
+                    player.sendMessage(BanSystem.getInstance().getMessages().getString("messages.banSyntax"));
                     return;
                 }
                 if (BanSystem.getInstance().getBanHandler().banPlayer(banPlayer, name, reason)) {
@@ -50,6 +58,14 @@ public class BanCommand extends Command {
                 }
                 break;
             default:
+                int i = 0;
+                for (Reason banReason : BanSystem.getInstance().getBanReason()) {
+                    i++;
+                    player.sendMessage(BanSystem.getInstance().getMessages().getString("messages.banSyntaxReason")
+                            .replace("%reason%", banReason.getName())
+                            .replace("%id%", String.valueOf(i))
+                            .replace("%duration%", banReason.getDuration().replace("-1", "Permanent")));
+                }
                 player.sendMessage(BanSystem.getInstance().getMessages().getString("messages.banSyntax"));
                 break;
         }

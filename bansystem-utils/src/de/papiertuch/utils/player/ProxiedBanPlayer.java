@@ -1,5 +1,6 @@
 package de.papiertuch.utils.player;
 
+import de.papiertuch.utils.BanSystem;
 import de.papiertuch.utils.player.interfaces.IBanPlayer;
 import lombok.Getter;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
@@ -13,6 +14,7 @@ public class ProxiedBanPlayer implements IBanPlayer {
 
     public ProxiedBanPlayer(ProxiedPlayer player) {
         this.player = player;
+        BanSystem.getInstance().getUuidFetcher().getCache().put(player.getName(), player.getUniqueId());
     }
 
     @Override

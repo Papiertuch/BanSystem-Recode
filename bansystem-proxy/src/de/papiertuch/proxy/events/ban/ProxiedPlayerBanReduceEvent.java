@@ -10,7 +10,5 @@ import java.util.UUID;
 public class ProxiedPlayerBanReduceEvent extends Event {
 
     private ProxiedPlayer player;
-    private UUID name;
-    private String reason;
-    private long oldDuration, duration;
+    private UUID target;
 }
