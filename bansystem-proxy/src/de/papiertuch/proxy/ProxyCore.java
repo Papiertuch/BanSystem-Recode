@@ -2,10 +2,10 @@ package de.papiertuch.proxy;
 
 import de.papiertuch.proxy.commands.KickCommand;
 import de.papiertuch.proxy.commands.LoginCommand;
-import de.papiertuch.proxy.commands.ban.BanCommand;
-import de.papiertuch.proxy.commands.ban.BanPointsCommand;
-import de.papiertuch.proxy.commands.ban.TempBanCommand;
-import de.papiertuch.proxy.commands.ban.UnbanCommand;
+import de.papiertuch.proxy.commands.ban.*;
+import de.papiertuch.proxy.commands.mute.MuteCommand;
+import de.papiertuch.proxy.commands.mute.TempMuteCommand;
+import de.papiertuch.proxy.commands.mute.UnmuteCommand;
 import de.papiertuch.proxy.listener.ChatListener;
 import de.papiertuch.proxy.listener.LoginListener;
 import de.papiertuch.proxy.listener.PlayerDisconnectListener;
@@ -41,16 +41,22 @@ public class ProxyCore extends Plugin {
 
     private void register() {
         PluginManager pluginManager = this.getProxy().getPluginManager();
-        pluginManager.registerListener(this, new LoginListener());
-        pluginManager.registerListener(this, new PostLoginListener());
         pluginManager.registerListener(this, new ChatListener());
+        pluginManager.registerListener(this, new LoginListener());
         pluginManager.registerListener(this, new PlayerDisconnectListener());
+        pluginManager.registerListener(this, new PostLoginListener());
 
         pluginManager.registerCommand(this, new BanCommand());
+        pluginManager.registerCommand(this, new BanPointsCommand());
+        pluginManager.registerCommand(this, new BanReduceCommand());
+        pluginManager.registerCommand(this, new TempBanCommand());
         pluginManager.registerCommand(this, new UnbanCommand());
+
+        pluginManager.registerCommand(this, new MuteCommand());
+        pluginManager.registerCommand(this, new TempMuteCommand());
+        pluginManager.registerCommand(this, new UnmuteCommand());
+
         pluginManager.registerCommand(this, new KickCommand());
         pluginManager.registerCommand(this, new LoginCommand());
-        pluginManager.registerCommand(this, new TempBanCommand());
-        pluginManager.registerCommand(this, new BanPointsCommand());
     }
 }

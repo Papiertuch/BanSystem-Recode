@@ -34,7 +34,7 @@ public class BanReduceCommand extends Command {
         switch (args.length) {
             case 1:
                 String name = args[0];
-                if (BanSystem.getInstance().getBanHandler().unbanPlayer(banPlayer, name)) {
+                if (BanSystem.getInstance().getBanHandler().reduceBan(banPlayer, name, BanSystem.getInstance().getConfig().getInt("settings.reduceBan"))) {
                     ProxyServer.getInstance().getPluginManager().callEvent(new ProxiedPlayerBanReduceEvent(
                             player, BanSystem.getInstance().getUuidFetcher().getUUID(name)));
                 }

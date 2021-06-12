@@ -15,11 +15,11 @@ import java.util.function.Consumer;
 
 public class MySQL implements IDataBase, IPlayerDataBase {
 
+    private static Connection connection;
+
     private ExecutorService executorService;
-    private String host, dataBase, user, password;
+    private String table, host, dataBase, user, password;
     private int port;
-    private Connection connection;
-    private String table;
 
     public MySQL(String table) {
         this.host = BanSystem.getInstance().getConfig().getString("database.host");
@@ -28,8 +28,10 @@ public class MySQL implements IDataBase, IPlayerDataBase {
         this.user = BanSystem.getInstance().getConfig().getString("database.user");
         this.password = BanSystem.getInstance().getConfig().getString("database.password");
         this.table = table;
-        this.executorService = Executors.newCachedThreadPool();
+
         connect();
+
+        this.executorService = Executors.newCachedThreadPool();
     }
 
     private void connect() {
@@ -38,17 +40,15 @@ public class MySQL implements IDataBase, IPlayerDataBase {
             connection = DriverManager.getConnection("jdbc:mysql://" + this.host + ":" +
                     this.port + "/" + this.dataBase +
                     "?autoReconnect=true", this.user, this.password);
-            System.out.println("[BanSystem] The connection to the MySQL server was successful");
-/*
             update("CREATE TABLE IF NOT EXISTS banTest (uuid VARCHAR(64), address VARCHAR(64), banPoints INT, banned BOOL, reason VARCHAR(64), banInfo VARCHAR(64), duration LONG, date VARCHAR(64), operator VARCHAR(64));");
             update("CREATE TABLE IF NOT EXISTS muteTest (uuid VARCHAR(64), address VARCHAR(64), banPoints INT, banned BOOL, reason VARCHAR(64), banInfo VARCHAR(64), duration LONG, date VARCHAR(64), operator VARCHAR(64));");
-            update("CREATE TABLE IF NOT EXISTS banTestHistory (id VARCHAR(64), uuid VARCHAR(64), user VARCHAR(64), date VARCHAR(64), banInfo VARCHAR(64), reduce VARCHAR(64), unban VARCHAR(64))");
-            update("CREATE TABLE IF NOT EXISTS muteTestHistory (id VARCHAR(64), uuid VARCHAR(64), user VARCHAR(64), date VARCHAR(64), banInfo VARCHAR(64), reduce VARCHAR(64), unban VARCHAR(64))");
+            update("CREATE TABLE IF NOT EXISTS banTestHistory (id VARCHAR(64), uuid VARCHAR(64), reason VARCHAR(64), user VARCHAR(64), date VARCHAR(64), banInfo VARCHAR(64), reduce VARCHAR(64), unban VARCHAR(64))");
+            update("CREATE TABLE IF NOT EXISTS muteTestHistory (id VARCHAR(64), uuid VARCHAR(64), reason VARCHAR(64), user VARCHAR(64), date VARCHAR(64), banInfo VARCHAR(64), reduce VARCHAR(64), unban VARCHAR(64))");
             update("CREATE TABLE IF NOT EXISTS playerTest (uuid VARCHAR(64), notify BOOL);");
- */
+            System.out.println("[Punish] The connection to the MySQL server was successful");
         } catch (Exception ex) {
             ex.printStackTrace();
-            System.out.println("[BanSystem] The connection to the MySQL server failed...");
+            System.out.println("[Punish] The connection to the MySQL server failed...");
         }
 
     }
@@ -250,7 +250,7 @@ public class MySQL implements IDataBase, IPlayerDataBase {
 
     @Override
     public boolean isIpBanned(String address) {
-        try (PreparedStatement preparedStatement = this.connection.prepareStatement("SELECT * FROM " + table + "History WHERE address = ?")) {
+        try (PreparedStatement preparedStatement = this.connection.prepareStatement("SELECT * FROM " + table + " WHERE address = ?")) {
             preparedStatement.setString(1, address);
             ResultSet resultSet = preparedStatement.executeQuery();
             if (resultSet.next()) {
@@ -284,7 +284,7 @@ public class MySQL implements IDataBase, IPlayerDataBase {
 
     @Override
     public long getDuration(UUID uuid) {
-        return (long) getValue(uuid, "duration");
+        return Long.valueOf(String.valueOf(getValue(uuid, "duration")));
     }
 
     @Override

@@ -8,7 +8,7 @@ import net.md_5.bungee.api.plugin.Command;
 public class BanPointsCommand extends Command {
 
     public BanPointsCommand() {
-        super("banPoints");
+        super("banPoints", null, "bp");
     }
 
     @Override

@@ -50,9 +50,9 @@ public class MongoDB implements IDataBase, IPlayerDataBase {
             clientOptions = MongoClientOptions.builder().build();
             client = new MongoClient(new ServerAddress(host, port), Arrays.asList(credential), clientOptions);
             mongoDatabase = client.getDatabase(dataBase);
-            System.out.println("[BanSystem] The connection to the MongoDB server was successful");
+            System.out.println("[Punish] The connection to the MongoDB server was successful");
         } catch (Exception ex) {
-            System.out.println("[BanSystem] The connection to the MongoDB server failed...");
+            System.out.println("[Punish] The connection to the MongoDB server failed...");
         }
     }
 

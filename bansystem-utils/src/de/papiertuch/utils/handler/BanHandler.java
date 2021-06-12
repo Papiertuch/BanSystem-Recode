@@ -27,7 +27,7 @@ public class BanHandler {
 
     @Getter
     private IDataBase dataBase;
-    private Config config;
+    private Config config, messages;
     private HashMap<String, Boolean> cache;
 
     public BanHandler() {
@@ -42,6 +42,7 @@ public class BanHandler {
                 break;
         }
         this.config = BanSystem.getInstance().getConfig();
+        this.messages = BanSystem.getInstance().getMessages();
         this.cache = new HashMap<>();
     }
 
@@ -67,7 +68,7 @@ public class BanHandler {
             this.cache.put(address, true);
             return false;
         } catch (JSONException e) {
-            System.out.println("[BanSystem] No VPN key was found...");
+            System.out.println("[Punish] No VPN key was found...");
         }
         return false;
     }
@@ -78,13 +79,13 @@ public class BanHandler {
 
     public boolean banPlayer(IBanPlayer banPlayer, String name, String reason, String duration, String... info) {
         if (banPlayer.getName().equalsIgnoreCase(name)) {
-            banPlayer.sendMessage(BanSystem.getInstance().getMessages().getString("messages.selfBanned"));
+            banPlayer.sendMessage(messages.getString("messages.selfBanned"));
             return false;
         }
         UUID uuid = BanSystem.getInstance().getUuidFetcher().getUUID(name);
         dataBase.create(uuid);
         if (dataBase.isBanned(uuid)) {
-            banPlayer.sendMessage(BanSystem.getInstance().getMessages().getString("messages.isBanned"));
+            banPlayer.sendMessage(messages.getString("messages.isBanned"));
             return false;
         }
 
@@ -95,7 +96,7 @@ public class BanHandler {
                 OfflinePlayer offlinePlayer = CloudAPI.getInstance().getOfflinePlayer(uuid);
                 if (offlinePlayer != null) {
                     if (config.getList("module.cloudNet.teamGroups").contains(offlinePlayer.getPermissionEntity().getHighestPermissionGroup(CloudAPI.getInstance().getPermissionPool()).getName())) {
-                        banPlayer.sendMessage(BanSystem.getInstance().getMessages().getString("messages.cannotBanned"));
+                        banPlayer.sendMessage(messages.getString("messages.cannotBanned"));
                         return false;
                     }
                 }
@@ -103,12 +104,12 @@ public class BanHandler {
                 IPermissionUser permissionUser = CloudNetDriver.getInstance().getPermissionManagement().getUser(uuid);
                 if (permissionUser != null) {
                     if (config.getList("module.cloudNet.teamGroups").contains(CloudNetDriver.getInstance().getPermissionManagement().getHighestPermissionGroup(permissionUser).getName())) {
-                        banPlayer.sendMessage(BanSystem.getInstance().getMessages().getString("messages.cannotBanned"));
+                        banPlayer.sendMessage(messages.getString("messages.cannotBanned"));
                         return false;
                     }
                 }
             } else if (target != null && target.hasPermission(BanSystem.getInstance().getConfig().getString("permission.banBypass"))) {
-                banPlayer.sendMessage(BanSystem.getInstance().getMessages().getString("messages.cannotBanned"));
+                banPlayer.sendMessage(messages.getString("messages.cannotBanned"));
                 return false;
             }
         }
@@ -131,9 +132,9 @@ public class BanHandler {
 
         for (IBanPlayer teamPlayers : BanSystem.getInstance().getNotify()) {
             if (teamPlayers != null) {
-                teamPlayers.sendMessage(BanSystem.getInstance().getMessages().getListAsString("messages.notify.ban")
+                teamPlayers.sendMessage(messages.getListAsString("messages.notify.ban")
                         .replace("%reason%", reasonObject.getName())
-                        .replace("%duration%", reasonObject.getDuration())
+                        .replace("%duration%", BanSystem.getInstance().getRemainingTime(getDurationLong(reasonObject.getDuration(), "")))
                         .replace("%target%", display)
                         .replace("%player%", banPlayer.getDisplayName()));
             }
@@ -152,9 +153,9 @@ public class BanHandler {
 
         if (target != null) {
             dataBase.setAddressAsync(uuid, target.getAddress());
-            target.disconnect(BanSystem.getInstance().getMessages().getListAsString("messages.screen.ban")
+            target.disconnect(messages.getListAsString("messages.screen.ban")
                     .replace("%reason%", reason)
-                    .replace("%duration%", reasonObject.getDuration()));
+                    .replace("%duration%", BanSystem.getInstance().getRemainingTime(getDurationLong(reasonObject.getDuration(), ""))));
         }
 
         return true;
@@ -163,13 +164,13 @@ public class BanHandler {
     public boolean reduceBan(IBanPlayer banPlayer, String name, int reduce) {
         UUID uuid = BanSystem.getInstance().getUuidFetcher().getUUID(name);
         if (dataBase.isExists(uuid) && !dataBase.isBanned(uuid)) {
-            banPlayer.sendMessage(BanSystem.getInstance().getMessages().getString("messages.notBanned"));
+            banPlayer.sendMessage(messages.getString("messages.notBanned"));
             return false;
         }
         long duration = (dataBase.getDuration(uuid) / reduce);
         for (IBanPlayer teamPlayers : BanSystem.getInstance().getNotify()) {
             if (teamPlayers != null) {
-                teamPlayers.sendMessage(BanSystem.getInstance().getMessages().getListAsString("messages.notify.reduce")
+                teamPlayers.sendMessage(messages.getListAsString("messages.notify.reduce")
                         .replace("%target%", name)
                         .replace("%duration%", String.valueOf(BanSystem.getInstance().getRemainingTime(duration)))
                         .replace("%player%", banPlayer.getDisplayName()));
@@ -182,11 +183,11 @@ public class BanHandler {
 
     public boolean kickPlayer(IBanPlayer banPlayer, IBanPlayer target, String reason) {
         if (target == null) {
-            banPlayer.sendMessage(BanSystem.getInstance().getMessages().getString("messages.isOffline"));
+            banPlayer.sendMessage(messages.getString("messages.isOffline"));
             return false;
         }
         if (target.getName().equalsIgnoreCase(banPlayer.getName())) {
-            banPlayer.sendMessage(BanSystem.getInstance().getMessages().getString("messages.selfKicked"));
+            banPlayer.sendMessage(messages.getString("messages.selfKicked"));
             return false;
         }
         if (!banPlayer.hasPermission(BanSystem.getInstance().getConfig().getString("permission.banEveryone"))) {
@@ -194,7 +195,7 @@ public class BanHandler {
                 OfflinePlayer offlinePlayer = CloudAPI.getInstance().getOfflinePlayer(target.getUniqueId());
                 if (offlinePlayer != null) {
                     if (config.getList("module.cloudNet.teamGroups").contains(offlinePlayer.getPermissionEntity().getHighestPermissionGroup(CloudAPI.getInstance().getPermissionPool()).getName())) {
-                        banPlayer.sendMessage(BanSystem.getInstance().getMessages().getString("messages.cannotBanned"));
+                        banPlayer.sendMessage(messages.getString("messages.cannotKicked"));
                         return false;
                     }
                 }
@@ -202,25 +203,25 @@ public class BanHandler {
                 IPermissionUser permissionUser = CloudNetDriver.getInstance().getPermissionManagement().getUser(target.getUniqueId());
                 if (permissionUser != null) {
                     if (config.getList("module.cloudNet.teamGroups").contains(CloudNetDriver.getInstance().getPermissionManagement().getHighestPermissionGroup(permissionUser).getName())) {
-                        banPlayer.sendMessage(BanSystem.getInstance().getMessages().getString("messages.cannotBanned"));
+                        banPlayer.sendMessage(messages.getString("messages.cannotKicked"));
                         return false;
                     }
                 }
             } else if (target != null && target.hasPermission(BanSystem.getInstance().getConfig().getString("permission.banBypass"))) {
                 System.out.println(target.getName());
-                banPlayer.sendMessage(BanSystem.getInstance().getMessages().getString("messages.cannotBanned"));
+                banPlayer.sendMessage(messages.getString("messages.cannotKicked"));
                 return false;
             }
         }
         for (IBanPlayer teamPlayers : BanSystem.getInstance().getNotify()) {
             if (teamPlayers != null) {
-                teamPlayers.sendMessage(BanSystem.getInstance().getMessages().getListAsString("messages.notify.kick")
+                teamPlayers.sendMessage(messages.getListAsString("messages.notify.kick")
                         .replace("%target%", target.getDisplayName())
                         .replace("%reason%", reason)
                         .replace("%player%", banPlayer.getDisplayName()));
             }
         }
-        target.disconnect(BanSystem.getInstance().getMessages().getListAsString("messages.screen.kick")
+        target.disconnect(messages.getListAsString("messages.screen.kick")
                 .replace("%reason%", reason)
                 .replace("%operator%", banPlayer.getName()));
         return true;
@@ -229,17 +230,17 @@ public class BanHandler {
     public boolean unbanPlayer(IBanPlayer banPlayer, String name) {
         UUID uuid = BanSystem.getInstance().getUuidFetcher().getUUID(name);
         if (banPlayer.getName().equalsIgnoreCase(name)) {
-            banPlayer.sendMessage(BanSystem.getInstance().getMessages().getString("messages.selfUnBanned"));
+            banPlayer.sendMessage(messages.getString("messages.selfUnBanned"));
             return false;
         }
         if (dataBase.isExists(uuid) && !dataBase.isBanned(uuid)) {
-            banPlayer.sendMessage(BanSystem.getInstance().getMessages().getString("messages.notBanned"));
+            banPlayer.sendMessage(messages.getString("messages.notBanned"));
             return false;
         }
 
         for (IBanPlayer teamPlayers : BanSystem.getInstance().getNotify()) {
             if (teamPlayers != null) {
-                teamPlayers.sendMessage(BanSystem.getInstance().getMessages().getListAsString("messages.notify.unban")
+                teamPlayers.sendMessage(messages.getListAsString("messages.notify.unban")
                         .replace("%target%", name)
                         .replace("%player%", banPlayer.getDisplayName()));
             }
@@ -297,7 +298,7 @@ public class BanHandler {
     }
 
     public String getBanScreen(String reason, long duration) {
-        return BanSystem.getInstance().getMessages().getListAsString("messages.screen.ban")
+        return messages.getListAsString("messages.screen.ban")
                 .replace("%reason%", reason)
                 .replace("%duration%", BanSystem.getInstance().getRemainingTime(duration));
     }

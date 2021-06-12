@@ -1,6 +1,7 @@
-package de.papiertuch.proxy.commands.ban;
+package de.papiertuch.proxy.commands.mute;
 
 import de.papiertuch.proxy.events.ban.ProxiedPlayerBanEvent;
+import de.papiertuch.proxy.events.mute.ProxiedPlayerMuteEvent;
 import de.papiertuch.utils.BanSystem;
 import de.papiertuch.utils.Reason;
 import de.papiertuch.utils.player.interfaces.IBanPlayer;
@@ -9,10 +10,10 @@ import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
 
-public class BanCommand extends Command {
+public class MuteCommand extends Command {
 
-    public BanCommand() {
-        super("ban");
+    public MuteCommand() {
+        super("mute");
     }
 
     @Override
@@ -22,7 +23,7 @@ public class BanCommand extends Command {
             return;
         }
         ProxiedPlayer player = (ProxiedPlayer) commandSender;
-        if (!player.hasPermission(BanSystem.getInstance().getConfig().getString("permissions.banCommand"))) {
+        if (!player.hasPermission(BanSystem.getInstance().getConfig().getString("permissions.muteCommand"))) {
             player.sendMessage(BanSystem.getInstance().getMessages().getString("messages.noPerms"));
             return;
         }
@@ -36,44 +37,45 @@ public class BanCommand extends Command {
                 String name = args[0];
                 String reason = args[1];
                 if (name.equalsIgnoreCase(player.getName())) {
-                    player.sendMessage(BanSystem.getInstance().getMessages().getString("messages.selfBanned"));
+                    player.sendMessage(BanSystem.getInstance().getMessages().getString("messages.selfMuted"));
                     return;
                 }
                 if (!isExists(reason)) {
                     int i = 0;
-                    player.sendMessage(BanSystem.getInstance().getMessages().getString("messages.reasons").replace("%amount%", String.valueOf(BanSystem.getInstance().getBanReason().size())));
-                    for (Reason banReason : BanSystem.getInstance().getBanReason()) {
+                    player.sendMessage(BanSystem.getInstance().getMessages().getString("messages.reasons").replace("%amount%", String.valueOf(BanSystem.getInstance().getMuteReason().size())));
+                    for (Reason banReason : BanSystem.getInstance().getMuteReason()) {
                         i++;
                         player.sendMessage(BanSystem.getInstance().getMessages().getString("messages.syntaxReason")
                                 .replace("%reason%", banReason.getName())
                                 .replace("%id%", String.valueOf(i))
                                 .replace("%duration%", banReason.getDuration().replace("-1", "Permanent")));
                     }
-                    player.sendMessage(BanSystem.getInstance().getMessages().getString("messages.banSyntax"));
+                    player.sendMessage(BanSystem.getInstance().getMessages().getString("messages.muteSyntax"));
                     return;
                 }
-                if (BanSystem.getInstance().getBanHandler().banPlayer(banPlayer, name, reason)) {
-                    ProxyServer.getInstance().getPluginManager().callEvent(new ProxiedPlayerBanEvent(banPlayer,
+                if (BanSystem.getInstance().getMuteHandler().mutePlayer(banPlayer, name, reason)) {
+                    ProxyServer.getInstance().getPluginManager().callEvent(new ProxiedPlayerMuteEvent(banPlayer,
                             BanSystem.getInstance().getUuidFetcher().getUUID(name),
                             BanSystem.getInstance().getBanHandler().getReason(reason)));
                 }
                 break;
             default:
                 int i = 0;
-                for (Reason banReason : BanSystem.getInstance().getBanReason()) {
+                player.sendMessage(BanSystem.getInstance().getMessages().getString("messages.reasons").replace("%amount%", String.valueOf(BanSystem.getInstance().getMuteReason().size())));
+                for (Reason banReason : BanSystem.getInstance().getMuteReason()) {
                     i++;
                     player.sendMessage(BanSystem.getInstance().getMessages().getString("messages.syntaxReason")
                             .replace("%reason%", banReason.getName())
                             .replace("%id%", String.valueOf(i))
                             .replace("%duration%", banReason.getDuration().replace("-1", "Permanent")));
                 }
-                player.sendMessage(BanSystem.getInstance().getMessages().getString("messages.banSyntax"));
+                player.sendMessage(BanSystem.getInstance().getMessages().getString("messages.muteSyntax"));
                 break;
         }
     }
 
     private boolean isExists(String string) {
-        for (Reason reason : BanSystem.getInstance().getBanReason()) {
+        for (Reason reason : BanSystem.getInstance().getMuteReason()) {
             if (reason.getName().equalsIgnoreCase(string)) {
                 return true;
             }

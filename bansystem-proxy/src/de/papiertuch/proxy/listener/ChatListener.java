@@ -29,18 +29,17 @@ public class ChatListener implements Listener {
                 return;
             }
         }
-        dataBase.isBannedAsync(player.getUniqueId(), muted -> {
-            if (muted) {
-                dataBase.getDurationAsync(player.getUniqueId(), duration -> {
-                    if (duration != -1 && duration <= System.currentTimeMillis()) {
-                        BanSystem.getInstance().getMuteHandler().resetBan(player.getUniqueId());
-                        return;
-                    }
-                    event.setCancelled(true);
-                    player.sendMessage(BanSystem.getInstance().getMessages().getListAsString("messages.screen.mute"));
-                    return;
-                });
+        if (dataBase.isBanned(player.getUniqueId())) {
+            long duration = dataBase.getDuration(player.getUniqueId());
+            if (duration != -1 && duration <= System.currentTimeMillis()) {
+                BanSystem.getInstance().getMuteHandler().resetBan(player.getUniqueId());
+                return;
             }
-        });
+            event.setCancelled(true);
+            player.sendMessage(BanSystem.getInstance().getMessages().getListAsString("messages.screen.mute")
+                    .replace("%duration%", BanSystem.getInstance().getRemainingTime(dataBase.getDuration(player.getUniqueId())))
+                    .replace("%reason%", dataBase.getReason(player.getUniqueId())));
+            return;
+        }
     }
 }

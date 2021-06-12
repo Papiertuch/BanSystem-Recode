@@ -23,6 +23,9 @@ module:
     vpnKey: 'Nzg2OTppa2dhbkJOdVZTZms3ODdHNDdjZzRZclhFNWJPSFdTWg=='
 permissions:
   banCommand: 'ban.command.ban'
+  tempMuteCommand: 'ban.command.tempmute'
+  muteCommand: 'ban.command.mute'
+  unmuteCommand: 'ban.command.unmute'
   tempBanCommand: 'ban.command.tempBan'
   unbanCommand: 'ban.command.unban'
   loginCommand: 'ban.command.login'
@@ -32,6 +35,7 @@ permissions:
   banEveryone: 'ban.op'
 settings:
   ipBan: true
+  reduceBan: 2
   banBypassing:
     name: 'Ban bypassing'
     duration: '-1'

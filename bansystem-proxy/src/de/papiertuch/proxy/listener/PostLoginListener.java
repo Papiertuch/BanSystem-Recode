@@ -28,12 +28,14 @@ public class PostLoginListener implements Listener {
                     }
                 });
             }
+  /*
             if (player.hasPermission(BanSystem.getInstance().getConfig().getString("permissions.updateNotify"))) {
                 if (!BanSystem.getInstance().getVersion().equalsIgnoreCase(ProxyCore.getInstance().getDescription().getVersion())) {
-                    player.sendMessage(BanSystem.getInstance().getConfig().getString("messages.prefix") + " §aA new version is available §8» §f§l" + BanSystem.getInstance().getVersion());
+                    player.sendMessage(BanSystem.getInstance().getMessages().getString("messages.prefix") + " §aA new version is available §8» §f§l" + BanSystem.getInstance().getVersion());
                     player.sendMessage("§ehttps://www.spigotmc.org/resources/bansystem-for-bungeecord-or-bukkit-mysql.57979/");
                 }
             }
+   */
         }, 1, TimeUnit.SECONDS);
     }
 }

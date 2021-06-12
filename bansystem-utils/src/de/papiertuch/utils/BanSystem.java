@@ -45,24 +45,25 @@ public class BanSystem {
 
     public BanSystem(String software, String currentVersion) {
         instance = this;
-        System.out.print(" ____               _____           _                 ");
-        System.out.print("|  _ \\             / ____|         | |                ");
-        System.out.print("| |_) | __ _ _ __ | (___  _   _ ___| |_ ___ _ __ ___  ");
-        System.out.print("|  _ < / _` | '_ \\ \\___ \\| | | / __| __/ _ \\ '_ ` _ \\ ");
-        System.out.print("| |_) | (_| | | | |____) | |_| \\__ \\ ||  __/ | | | | |");
-        System.out.print("|____/ \\__,_|_| |_|_____/ \\__, |___/\\__\\___|_| |_| |_|");
-        System.out.print("                           __/ |                      ");
-        System.out.print("                          |___/                       ");
-        System.out.print("                                                       ");
+        System.out.print(" ___                           _     ");
+        System.out.print("(  _`\\                _       ( )    ");
+        System.out.print("| |_) ) _   _   ___  (_)  ___ | |__  ");
+        System.out.print("| ,__/'( ) ( )/' _ `\\| |/',__)|  _ `\\");
+        System.out.print("| |    | (_) || ( ) || |\\__, \\| | | |");
+        System.out.print("(_)    `\\___/'(_) (_)(_)(____/(_) (_)");
+        System.out.print("                                     ");
         System.out.println("> by Papiertuch | Discord: https://papiertu.ch/go/discord/");
         System.out.println("> Software: " + software);
         System.out.println("> Pluginversion: " + currentVersion);
+        System.out.println("");
 
-       this.version =  checkUpdate();
+        this.version = checkUpdate();
+ /*
        if (!this.version.equalsIgnoreCase(currentVersion)) {
-           System.out.println("[BanSystem] A new version is available: " + this.version);
-           System.out.println("[BanSystem] Download: https://www.spigotmc.org/resources/bansystem-for-bungeecord-or-bukkit-mysql.57979/");
+           System.out.println("[Punish] A new version is available: " + this.version);
+           System.out.println("[Punish] Download: https://www.spigotmc.org/resources/bansystem-for-bungeecord-or-bukkit-mysql.57979/");
        }
+  */
 
         this.dateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm");
 
@@ -123,10 +124,10 @@ public class BanSystem {
     public String checkUpdate() {
         try (InputStream inputStream = new URL("https://api.spigotmc.org/legacy/update.php?resource=" + 57979).openStream(); Scanner scanner = new Scanner(inputStream)) {
             if (scanner.hasNext()) {
-              return scanner.next();
+                return scanner.next();
             }
         } catch (IOException exception) {
-            System.out.println("[BanSystem] No connection to the WebServer could be established, you will not receive update notifications");
+            System.out.println("[Punish] No connection to the WebServer could be established, you will not receive update notifications");
         }
         return "null";
     }
@@ -160,18 +161,27 @@ public class BanSystem {
         if (minutes == 1) {
             minute = this.messages.getString("messages.timeFormat.minute");
         }
+        System.out.println(minutes);
+        System.out.println(hours);
+        System.out.println(days);
         if (minutes < 1 && days == 0 && hours == 0) {
             return this.messages.getString("messages.timeFormat.lessMinute");
         }
         if (hours == 0 && days == 0) {
             return minutes + " " + minute;
         }
+        if (days == 0 && minutes == 0) {
+            return hours + " " + hour;
+        }
         if (days == 0) {
             return hours + " " + hour + " " + minutes + " " + minute;
+        }
+        if (minutes == 0) {
+            return days + " " + day + " " + hours + " " + hour;
         }
         if (hours == 0 && minutes == 0) {
             return days + " " + day;
         }
-        return days + " " + day + " " + hours + " " + hour + " " + minutes + " " + minute;
+        return days + " " + day + " " + hours + " " + hour;
     }
 }
