@@ -32,6 +32,8 @@ public class BanCommand extends Command {
             return;
         }
         switch (args.length) {
+            case 3:
+                //TODO ADD /ban <Spieler> <Reason> <Info>
             case 2:
                 String name = args[0];
                 String reason = args[1];
