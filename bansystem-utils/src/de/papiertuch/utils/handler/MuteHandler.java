@@ -106,7 +106,7 @@ public class MuteHandler {
             if (teamPlayers != null) {
                 teamPlayers.sendMessage(messages.getListAsString("messages.notify.mute")
                         .replace("%reason%", reasonObject.getName())
-                        .replace("%duration%", BanSystem.getInstance().getRemainingTime(getDurationLong(reasonObject.getDuration(), "")))
+                        .replace("%duration%", BanSystem.getInstance().getRemainingTime(getDurationLong("", reasonObject.getDuration())))
                         .replace("%target%", display)
                         .replace("%player%", banPlayer.getDisplayName()));
             }
@@ -126,7 +126,7 @@ public class MuteHandler {
         if (target != null) {
             target.disconnect(messages.getListAsString("messages.screen.mute")
                     .replace("%reason%", reason)
-                    .replace("%duration%", BanSystem.getInstance().getRemainingTime(getDurationLong(reasonObject.getDuration(), ""))));
+                    .replace("%duration%", BanSystem.getInstance().getRemainingTime(getDurationLong("", reasonObject.getDuration()))));
         }
 
         return true;
@@ -174,18 +174,18 @@ public class MuteHandler {
         dataBase.setBanInfoAsync(uuid, "");
     }
 
-    public long getDurationLong(String string, String durationString) {
-        long duration = Long.parseLong(durationString.split(" ")[0]);
+    public long getDurationLong(String name, String durationAsString) {
+        long duration = Long.parseLong(durationAsString.split(" ")[0]);
         long time = -1;
-        Reason reason = getReason(string);
+        Reason reason = getReason(name);
         if (reason == null) {
-            if (durationString.contains("s")) {
+            if (durationAsString.contains("s")) {
                 time = duration * 1000;
-            } else if (durationString.contains("m")) {
+            } else if (durationAsString.contains("m")) {
                 time = duration * 1000 * 60;
-            } else if (durationString.contains("h")) {
+            } else if (durationAsString.contains("h")) {
                 time = duration * 1000 * 60 * 60;
-            } else if (durationString.contains("d")) {
+            } else if (durationAsString.contains("d")) {
                 time = duration * 1000 * 60 * 60 * 24;
             }
             return time;
