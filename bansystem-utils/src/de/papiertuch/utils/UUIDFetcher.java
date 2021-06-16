@@ -43,7 +43,7 @@ public class UUIDFetcher {
         }
         try {
             URLConnection urlConnection = new URL("https://api.minetools.eu/uuid/" + name).openConnection();
-            urlConnection.setReadTimeout(2000);
+            urlConnection.setReadTimeout(1000);
             String uuidAsString = new JsonParser().parse(new InputStreamReader(urlConnection.getInputStream()))
                     .getAsJsonObject().get("id").toString().replace("\"", "");
 
@@ -55,7 +55,7 @@ public class UUIDFetcher {
                     .toString()));
             return cache.get(name);
         } catch (Exception e) {
-            System.out.println("[BanSystem] failed fetch uuid of " + name + " this player no exists");
+            System.out.println("[BanSystem] failed fetch uuid of " + name + " this player no exists or the API-Server is blocked");
         }
         return UUID.randomUUID();
     }

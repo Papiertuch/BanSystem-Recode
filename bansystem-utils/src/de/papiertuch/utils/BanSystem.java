@@ -161,9 +161,6 @@ public class BanSystem {
         if (minutes == 1) {
             minute = this.messages.getString("messages.timeFormat.minute");
         }
-        System.out.println(minutes);
-        System.out.println(hours);
-        System.out.println(days);
         if (minutes < 1 && days == 0 && hours == 0) {
             return this.messages.getString("messages.timeFormat.lessMinute");
         }
@@ -176,10 +173,10 @@ public class BanSystem {
         if (days == 0) {
             return hours + " " + hour + " " + minutes + " " + minute;
         }
-        if (minutes == 0) {
+        if (minutes == 0 && hours != 0) {
             return days + " " + day + " " + hours + " " + hour;
         }
-        if (hours == 0 && minutes == 0) {
+        if (hours == 0) {
             return days + " " + day;
         }
         return days + " " + day + " " + hours + " " + hour;

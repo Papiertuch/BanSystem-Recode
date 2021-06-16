@@ -106,7 +106,7 @@ public class MuteHandler {
             if (teamPlayers != null) {
                 teamPlayers.sendMessage(messages.getListAsString("messages.notify.mute")
                         .replace("%reason%", reasonObject.getName())
-                        .replace("%duration%", BanSystem.getInstance().getRemainingTime(getDurationLong("", reasonObject.getDuration())))
+                        .replace("%duration%", BanSystem.getInstance().getRemainingTime(banTime))
                         .replace("%target%", display)
                         .replace("%player%", banPlayer.getDisplayName()));
             }
@@ -126,7 +126,7 @@ public class MuteHandler {
         if (target != null) {
             target.disconnect(messages.getListAsString("messages.screen.mute")
                     .replace("%reason%", reason)
-                    .replace("%duration%", BanSystem.getInstance().getRemainingTime(getDurationLong("", reasonObject.getDuration()))));
+                    .replace("%duration%", BanSystem.getInstance().getRemainingTime(banTime)));
         }
 
         return true;

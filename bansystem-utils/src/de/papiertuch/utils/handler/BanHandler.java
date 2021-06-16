@@ -116,8 +116,6 @@ public class BanHandler {
         long banTime = -1;
         if (!duration.equalsIgnoreCase("-1")) {
             banTime = getDurationLong(reason, duration) + System.currentTimeMillis();
-        } else {
-            duration = "Permanent";
         }
         if (dataBase.getBanPoints(uuid) >= 100) {
             banTime = -1;
@@ -134,7 +132,7 @@ public class BanHandler {
             if (teamPlayers != null) {
                 teamPlayers.sendMessage(messages.getListAsString("messages.notify.ban")
                         .replace("%reason%", reasonObject.getName())
-                        .replace("%duration%", BanSystem.getInstance().getRemainingTime(getDurationLong("", reasonObject.getDuration())))
+                        .replace("%duration%", BanSystem.getInstance().getRemainingTime(banTime))
                         .replace("%target%", display)
                         .replace("%player%", banPlayer.getDisplayName()));
             }
@@ -155,7 +153,7 @@ public class BanHandler {
             dataBase.setAddressAsync(uuid, target.getAddress());
             target.disconnect(messages.getListAsString("messages.screen.ban")
                     .replace("%reason%", reason)
-                    .replace("%duration%", BanSystem.getInstance().getRemainingTime(getDurationLong("", reasonObject.getDuration()))));
+                    .replace("%duration%", BanSystem.getInstance().getRemainingTime(banTime)));
         }
 
         return true;
