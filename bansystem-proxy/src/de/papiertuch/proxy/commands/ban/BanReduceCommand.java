@@ -1,7 +1,6 @@
 package de.papiertuch.proxy.commands.ban;
 
 import de.papiertuch.proxy.events.ban.ProxiedPlayerBanReduceEvent;
-import de.papiertuch.proxy.events.ban.ProxiedPlayerUnBanEvent;
 import de.papiertuch.utils.BanSystem;
 import de.papiertuch.utils.player.interfaces.IBanPlayer;
 import net.md_5.bungee.api.CommandSender;

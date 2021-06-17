@@ -12,11 +12,6 @@ import de.papiertuch.utils.database.MySQL;
 import de.papiertuch.utils.database.interfaces.IDataBase;
 import de.papiertuch.utils.player.interfaces.IBanPlayer;
 import lombok.Getter;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.Date;
 import java.util.HashMap;

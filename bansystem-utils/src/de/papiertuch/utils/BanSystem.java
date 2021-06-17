@@ -3,7 +3,6 @@ package de.papiertuch.utils;
 import de.papiertuch.utils.config.Config;
 import de.papiertuch.utils.database.MongoDB;
 import de.papiertuch.utils.database.MySQL;
-import de.papiertuch.utils.database.interfaces.IDataBase;
 import de.papiertuch.utils.database.interfaces.IPlayerDataBase;
 import de.papiertuch.utils.handler.BanHandler;
 import de.papiertuch.utils.handler.MuteHandler;
@@ -16,11 +15,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.concurrent.Executor;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Consumer;
 
 @Getter
 public class BanSystem {

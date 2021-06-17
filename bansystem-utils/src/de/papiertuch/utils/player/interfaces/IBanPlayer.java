@@ -4,12 +4,6 @@ import java.util.UUID;
 
 public interface IBanPlayer {
 
-    public enum PlayerType {
-        CONSOLE,
-        BUKKIT_PLAYER,
-        PROXIED_PLAYER;
-    }
-
     public PlayerType getType();
 
     public void sendMessage(String message);
@@ -27,6 +21,12 @@ public interface IBanPlayer {
     public String getAddress();
 
     public boolean hasPermission(String permission);
+
+    public enum PlayerType {
+        CONSOLE,
+        BUKKIT_PLAYER,
+        PROXIED_PLAYER;
+    }
 }
 
 

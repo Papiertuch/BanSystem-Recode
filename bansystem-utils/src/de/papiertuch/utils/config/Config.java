@@ -24,6 +24,7 @@ public class Config {
         if (!file.exists()) file.mkdirs();
         try (InputStream localInputStream = Config.class.getClassLoader().getResourceAsStream(config)) {
             if (!Files.exists(path)) {
+                assert localInputStream != null;
                 Files.copy(localInputStream, this.path);
             }
             this.configuration = ConfigurationProvider.getProvider(YamlConfiguration.class).load(path.toFile());
