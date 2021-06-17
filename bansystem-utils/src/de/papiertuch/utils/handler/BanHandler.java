@@ -295,10 +295,11 @@ public class BanHandler {
         return time;
     }
 
-    public String getBanScreen(String reason, long duration) {
+    public String getBanScreen(String reason, long duration, UUID uuid) {
         return messages.getListAsString("messages.screen.ban")
                 .replace("%reason%", reason)
-                .replace("%duration%", BanSystem.getInstance().getRemainingTime(duration));
+                .replace("%duration%", BanSystem.getInstance().getRemainingTime(duration))
+                .replace("%operator%", dataBase.getOperator(uuid));
     }
 
     public Reason getReason(String string) {

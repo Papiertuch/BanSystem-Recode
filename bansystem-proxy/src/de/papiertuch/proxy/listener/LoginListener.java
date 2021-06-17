@@ -63,7 +63,7 @@ public class LoginListener implements Listener {
                 if (duration != -1 && duration <= System.currentTimeMillis()) {
                     BanSystem.getInstance().getBanHandler().resetBan(uuid);
                 } else {
-                    event.setCancelReason(BanSystem.getInstance().getBanHandler().getBanScreen(dataBase.getReason(uuid), dataBase.getDuration(uuid)));
+                    event.setCancelReason(BanSystem.getInstance().getBanHandler().getBanScreen(dataBase.getReason(uuid), dataBase.getDuration(uuid), uuid));
                     event.setCancelled(true);
                 }
             } else if (dataBase.isIpBanned(address)) {
@@ -72,7 +72,7 @@ public class LoginListener implements Listener {
                     ProxyServer.getInstance().getPluginManager().callEvent(new ProxiedPlayerBanEvent(ProxyCore.getInstance().getConsolePlayer(),
                             uuid, reason));
                 }
-                event.setCancelReason(BanSystem.getInstance().getBanHandler().getBanScreen(dataBase.getReason(uuid), dataBase.getDuration(uuid)));
+                event.setCancelReason(BanSystem.getInstance().getBanHandler().getBanScreen(dataBase.getReason(uuid), dataBase.getDuration(uuid), uuid));
                 event.setCancelled(true);
             }
             event.completeIntent(ProxyCore.getInstance());
