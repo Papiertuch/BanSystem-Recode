@@ -31,7 +31,7 @@ public class MySQL implements IDataBase, IPlayerDataBase {
 
         connect();
 
-        this.executorService = Executors.newCachedThreadPool();
+        this.executorService = Executors.newFixedThreadPool(4);
     }
 
     private void connect() {
