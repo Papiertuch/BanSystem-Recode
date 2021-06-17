@@ -5,21 +5,21 @@ import java.util.function.Consumer;
 
 public interface IPlayerDataBase {
 
-    public boolean isConnected();
+    boolean isConnected();
 
-    public boolean isExistsPlayer(UUID uuid);
+    boolean isExistsPlayer(UUID uuid);
 
-    public void createPlayer(UUID uuid);
+    void createPlayer(UUID uuid);
 
-    public void setNotify(UUID uuid, boolean value);
+    void setNotify(UUID uuid, boolean value);
 
-    public boolean isNotify(UUID uuid);
+    boolean isNotify(UUID uuid);
 
-    public void isExistsPlayerAsync(UUID uuid, Consumer<Boolean> consumer);
+    void isExistsPlayerAsync(UUID uuid, Consumer<Boolean> consumer);
 
-    public void createPlayerAsync(UUID uuid);
+    void createPlayerAsync(UUID uuid);
 
-    public void setNotifyAsync(UUID uuid, boolean value);
+    void setNotifyAsync(UUID uuid, boolean value);
 
-    public void isNotifyAsync(UUID uuid, Consumer<Boolean> consumer);
+    void isNotifyAsync(UUID uuid, Consumer<Boolean> consumer);
 }

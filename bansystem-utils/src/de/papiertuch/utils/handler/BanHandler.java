@@ -12,7 +12,6 @@ import de.papiertuch.utils.database.MySQL;
 import de.papiertuch.utils.database.interfaces.IDataBase;
 import de.papiertuch.utils.player.interfaces.IBanPlayer;
 import lombok.Getter;
-import net.md_5.bungee.api.ProxyServer;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -292,13 +291,15 @@ public class BanHandler {
         } else if (reason.getDuration().contains("d")) {
             time = duration * 1000 * 60 * 60 * 24;
         }
+
         return time;
     }
 
-    public String getBanScreen(String reason, long duration) {
+    public String getBanScreen(String reason, long duration, UUID uuid) {
         return messages.getListAsString("messages.screen.ban")
                 .replace("%reason%", reason)
-                .replace("%duration%", BanSystem.getInstance().getRemainingTime(duration));
+                .replace("%duration%", BanSystem.getInstance().getRemainingTime(duration))
+                .replace("%operator%", dataBase.getOperator(uuid));
     }
 
     public Reason getReason(String string) {

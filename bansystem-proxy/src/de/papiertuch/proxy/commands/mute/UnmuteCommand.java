@@ -1,6 +1,5 @@
 package de.papiertuch.proxy.commands.mute;
 
-import de.papiertuch.proxy.events.ban.ProxiedPlayerUnBanEvent;
 import de.papiertuch.proxy.events.mute.ProxiedPlayerUnMuteEvent;
 import de.papiertuch.utils.BanSystem;
 import de.papiertuch.utils.player.interfaces.IBanPlayer;

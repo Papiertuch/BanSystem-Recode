@@ -1,6 +1,9 @@
 package de.papiertuch.utils.database;
 
-import com.mongodb.*;
+import com.mongodb.MongoClient;
+import com.mongodb.MongoClientOptions;
+import com.mongodb.MongoCredential;
+import com.mongodb.ServerAddress;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
@@ -10,22 +13,23 @@ import de.papiertuch.utils.database.interfaces.IDataBase;
 import de.papiertuch.utils.database.interfaces.IPlayerDataBase;
 import org.bson.Document;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 
 public class MongoDB implements IDataBase, IPlayerDataBase {
 
-    private ExecutorService executorService;
-    private String host, dataBase, user, password;
-    private int port;
-
     private static MongoCredential credential;
     private static MongoClientOptions clientOptions;
     private static MongoClient client;
     private static MongoDatabase mongoDatabase;
-
+    private ExecutorService executorService;
+    private String host, dataBase, user, password;
+    private int port;
     private MongoCollection<Document> collection, historyCollection;
 
 

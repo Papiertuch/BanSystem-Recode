@@ -31,7 +31,7 @@ public class MySQL implements IDataBase, IPlayerDataBase {
 
         connect();
 
-        this.executorService = Executors.newCachedThreadPool();
+        this.executorService = Executors.newFixedThreadPool(4);
     }
 
     private void connect() {
@@ -50,7 +50,6 @@ public class MySQL implements IDataBase, IPlayerDataBase {
             ex.printStackTrace();
             System.out.println("[Punish] The connection to the MySQL server failed...");
         }
-
     }
 
     public void update(String query) {
@@ -119,7 +118,7 @@ public class MySQL implements IDataBase, IPlayerDataBase {
             preparedStatement.setBoolean(4, false);
             preparedStatement.setString(5, "");
             preparedStatement.setString(6, "");
-            preparedStatement.setLong(7, 0l);
+            preparedStatement.setLong(7, 0L);
             preparedStatement.setString(8, "");
             preparedStatement.setString(9, "");
             preparedStatement.executeUpdate();

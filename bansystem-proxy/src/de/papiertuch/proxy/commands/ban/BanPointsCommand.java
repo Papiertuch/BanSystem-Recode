@@ -20,7 +20,7 @@ public class BanPointsCommand extends Command {
         ProxiedPlayer player = (ProxiedPlayer) commandSender;
         BanSystem.getInstance().getBanHandler().getDataBase().getBanPointsAsync(player.getUniqueId(), points -> {
             player.sendMessage(BanSystem.getInstance().getMessages().getString("messages.banPoints")
-            .replace("%points%", String.valueOf(points)));
+                    .replace("%points%", String.valueOf(points)));
         });
     }
 }
