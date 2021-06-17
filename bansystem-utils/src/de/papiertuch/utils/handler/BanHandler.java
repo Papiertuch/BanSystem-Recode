@@ -291,6 +291,7 @@ public class BanHandler {
         } else if (reason.getDuration().contains("d")) {
             time = duration * 1000 * 60 * 60 * 24;
         }
+
         return time;
     }
 

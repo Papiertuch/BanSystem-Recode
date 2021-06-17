@@ -4,28 +4,28 @@ import java.util.UUID;
 
 public interface IBanPlayer {
 
-    public PlayerType getType();
+    PlayerType getType();
 
-    public void sendMessage(String message);
+    void sendMessage(String message);
 
-    public void disconnect(String string);
+    void disconnect(String string);
 
-    public String getName();
+    String getName();
 
-    public UUID getUniqueId();
+    UUID getUniqueId();
 
-    public String getDisplayName();
+    String getDisplayName();
 
-    public String getServer();
+    String getServer();
 
-    public String getAddress();
+    String getAddress();
 
-    public boolean hasPermission(String permission);
+    boolean hasPermission(String permission);
 
-    public enum PlayerType {
+    enum PlayerType {
         CONSOLE,
         BUKKIT_PLAYER,
-        PROXIED_PLAYER;
+        PROXIED_PLAYER
     }
 }
 
