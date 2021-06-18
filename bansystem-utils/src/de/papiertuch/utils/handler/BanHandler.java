@@ -1,5 +1,6 @@
 package de.papiertuch.utils.handler;
 
+import com.google.gson.JsonObject;
 import de.dytanic.cloudnet.api.CloudAPI;
 import de.dytanic.cloudnet.driver.CloudNetDriver;
 import de.dytanic.cloudnet.driver.permission.IPermissionUser;
@@ -20,6 +21,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import javax.annotation.Nullable;
+import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Objects;
@@ -57,18 +59,19 @@ public class BanHandler {
             OkHttpClient caller = new OkHttpClient();
             Request request = new Request.Builder().url("http://v2.api.iphub.info/ip/" + address)
                     .addHeader("X-Key", BanSystem.getInstance().getConfig().getString("module.antiBot.vpnKey")).build();
-            try {
-                Response response = caller.newCall(request).execute();
+
+            try (Response response = caller.newCall(request).execute()) {
                 JSONObject json = new JSONObject(Objects.requireNonNull(response.body()).string());
                 block = (int) json.get("block");
                 if (block == 1) {
                     this.cache.put(address, true);
                     return true;
                 }
-            } catch (Exception e) {
-                e.printStackTrace();
+
+                this.cache.put(address, true);
+            } catch (IOException exception) {
+                exception.printStackTrace();
             }
-            this.cache.put(address, true);
             return false;
         } catch (JSONException e) {
             System.out.println("[Punish] No VPN key was found...");
