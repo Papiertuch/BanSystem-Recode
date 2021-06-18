@@ -1,6 +1,5 @@
 package de.papiertuch.utils.handler;
 
-import com.google.gson.JsonObject;
 import de.dytanic.cloudnet.api.CloudAPI;
 import de.dytanic.cloudnet.driver.CloudNetDriver;
 import de.dytanic.cloudnet.driver.permission.IPermissionUser;
@@ -11,6 +10,7 @@ import de.papiertuch.utils.config.Config;
 import de.papiertuch.utils.database.MongoDB;
 import de.papiertuch.utils.database.MySQL;
 import de.papiertuch.utils.database.interfaces.IDataBase;
+import de.papiertuch.utils.handler.exception.ExceptionHandler;
 import de.papiertuch.utils.player.interfaces.IBanPlayer;
 import lombok.Getter;
 import okhttp3.OkHttpClient;
@@ -70,10 +70,10 @@ public class BanHandler {
 
                 this.cache.put(address, true);
             } catch (IOException exception) {
-                exception.printStackTrace();
+                ExceptionHandler.handleException(exception, "Error while executing the response", true);
             }
             return false;
-        } catch (JSONException e) {
+        } catch (JSONException exception) {
             System.out.println("[Punish] No VPN key was found...");
         }
         return false;
