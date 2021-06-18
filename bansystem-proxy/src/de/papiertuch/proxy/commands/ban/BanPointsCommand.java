@@ -18,9 +18,11 @@ public class BanPointsCommand extends Command {
             return;
         }
         ProxiedPlayer player = (ProxiedPlayer) commandSender;
-        BanSystem.getInstance().getBanHandler().getDataBase().getBanPointsAsync(player.getUniqueId(), points -> {
-            player.sendMessage(BanSystem.getInstance().getMessages().getString("messages.banPoints")
-                    .replace("%points%", String.valueOf(points)));
+        BanSystem.getInstance().getBanHandler().getDataBase().getBanPointsAsync(player.getUniqueId(), banPoints -> {
+            BanSystem.getInstance().getMuteHandler().getDataBase().getBanPointsAsync(player.getUniqueId(),
+                    mutePoints -> player.sendMessage(BanSystem.getInstance().getMessages().getString("messages.banPoints")
+                            .replace("%mutePoints%", String.valueOf(mutePoints))
+                            .replace("%banPoints%", String.valueOf(banPoints))));
         });
     }
 }
