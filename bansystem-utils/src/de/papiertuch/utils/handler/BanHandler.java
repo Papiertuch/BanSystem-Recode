@@ -49,7 +49,7 @@ public class BanHandler {
         this.cache = new HashMap<>();
     }
 
-    public boolean hasVPN(String address) {
+    public boolean hasVPN(@NotNull String address) {
         try {
             if (address.equalsIgnoreCase("127.0.0.1")) return false;
             if (this.cache.containsKey(address)) return this.cache.get(address);
