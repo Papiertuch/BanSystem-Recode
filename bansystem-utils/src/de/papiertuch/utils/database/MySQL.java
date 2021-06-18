@@ -225,7 +225,7 @@ public class MySQL implements IDataBase, IPlayerDataBase {
 
     public int getHistorySize(UUID uuid) {
         int i = 0;
-        try (PreparedStatement preparedStatement = this.connection.prepareStatement("SELECT * FROM " + table + " " +
+        try (PreparedStatement preparedStatement = this.connection.prepareStatement("SELECT * FROM " + table + "History " +
                 "WHERE uuid = ?")) {
             preparedStatement.setString(1, uuid.toString());
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
@@ -242,14 +242,15 @@ public class MySQL implements IDataBase, IPlayerDataBase {
     @Override
     public ArrayList<Document> getHistory(UUID uuid) {
         ArrayList<Document> list = new ArrayList<>();
-        for (int i = 1; i < getHistorySize(uuid); i++) {
+        for (int i = 0; i < getHistorySize(uuid); i++) {
             String id = uuid + "#" + i;
             Document document = new Document();
             document.put("id", id);
             document.put("uuid", uuid.toString());
             document.put("reason", getValueHistory(id, "reason"));
             document.put("date", getValueHistory(id, "date"));
-            document.put("banInfo", getValueHistory(id, "banInfo"));
+            document.put("user", getValueHistory(id, "user"));
+            document.put("info", getValueHistory(id, "banInfo"));
             document.put("reduce", getValueHistory(id, "reduce"));
             document.put("unban", getValueHistory(id, "unban"));
             list.add(document);
