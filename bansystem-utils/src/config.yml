@@ -1,5 +1,5 @@
 database:
-  #MySQL, MongoDB
+  #Available options: MySQL, MongoDB
   type: 'MySQL'
   host: 'host'
   port: 3306
@@ -23,19 +23,24 @@ module:
     vpnKey: 'Nzg2OTppa2dhbkJOdVZTZms3ODdHNDdjZzRZclhFNWJPSFdTWg=='
 permissions:
   banCommand: 'ban.command.ban'
-  tempMuteCommand: 'ban.command.tempmute'
+  tempMuteCommand: 'ban.command.tempMute'
   muteCommand: 'ban.command.mute'
-  unmuteCommand: 'ban.command.unmute'
+  unmuteCommand: 'ban.command.unMute'
   tempBanCommand: 'ban.command.tempBan'
   unbanCommand: 'ban.command.unban'
   loginCommand: 'ban.command.login'
-  reduceCommand: 'ban.command.reduce'
+  banReduceCommand: 'ban.command.reduce'
+  muteReduceCommand: 'ban.command.reduce'
+  banHistoryCommand: 'ban.command.banHistory'
+  muteHistoryCommand: 'ban.command.muteHistory'
   updateNotify: 'ban.notify.update'
   banBypass: 'ban.bypass'
   banEveryone: 'ban.op'
 settings:
   ipBan: true
+  #The value by how much the ban/mute is shortened 2=half
   reduceBan: 2
+  reduceMute: 2
   banBypassing:
     name: 'Ban bypassing'
     duration: '-1'
