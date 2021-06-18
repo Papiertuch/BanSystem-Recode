@@ -164,7 +164,7 @@ public class BanHandler {
         if (target != null) {
             dataBase.setAddressAsync(uuid, target.getAddress());
             target.disconnect(messages.getListAsString("messages.screen.ban")
-                    .replace("%reason%", reason)
+                    .replace("%reason%", Objects.requireNonNull(this.getReason(reason)).getName())
                     .replace("%duration%", BanSystem.getInstance().getRemainingTime(banTime))
                     .replace("%operator%", dataBase.getOperator(uuid)));
         }
@@ -283,10 +283,11 @@ public class BanHandler {
         dataBase.setBanInfoAsync(uuid, "");
     }
 
-    public long getDurationLong(@NotNull String name, @NotNull String durationAsString) {
+    public long getDurationLong(@NotNull String reasonName, @NotNull String durationAsString) {
         long duration = Long.parseLong(durationAsString.split(" ")[0]);
         long time = -1;
-        Reason reason = getReason(name);
+
+        Reason reason = this.getReason(reasonName);
         if (reason == null) {
             if (durationAsString.contains("s")) {
                 time = duration * 1000;
@@ -330,18 +331,14 @@ public class BanHandler {
     /**
      * Get a new {@link Reason} object
      *
-     * @param reasonInput the reason id or reason name
+     * @param reasonName the reason id or reason name
      * @return the new {@link Reason} object
      */
     @Nullable
-    public Reason getReason(@NotNull String reasonInput) {
+    public Reason getReason(@NotNull String reasonName) {
         for (Reason reason : BanSystem.getInstance().getBanReason()) {
-            if (reason.getName().equalsIgnoreCase(reasonInput)) {
-                return reason;
-            }
-            if (String.valueOf(reason.getId()).equalsIgnoreCase(reasonInput)) {
-                return reason;
-            }
+            if (reason.getName().equalsIgnoreCase(reasonName)) return reason;
+            if (String.valueOf(reason.getId()).equalsIgnoreCase(reasonName)) return reason;
         }
         return null;
     }

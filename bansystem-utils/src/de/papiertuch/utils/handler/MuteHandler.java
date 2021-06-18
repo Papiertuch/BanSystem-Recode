@@ -202,12 +202,8 @@ public class MuteHandler {
 
     public Reason getReason(String string) {
         for (Reason reason : BanSystem.getInstance().getMuteReason()) {
-            if (reason.getName().equalsIgnoreCase(string)) {
-                return reason;
-            }
-            if (String.valueOf(reason.getId()).equalsIgnoreCase(string)) {
-                return reason;
-            }
+            if (reason.getName().equalsIgnoreCase(string)) return reason;
+            if (String.valueOf(reason.getId()).equalsIgnoreCase(string)) return reason;
         }
         return null;
     }
