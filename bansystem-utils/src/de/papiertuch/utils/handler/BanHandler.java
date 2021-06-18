@@ -22,6 +22,7 @@ import org.json.JSONObject;
 import javax.annotation.Nullable;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Objects;
 import java.util.UUID;
 
 public class BanHandler {
@@ -314,7 +315,7 @@ public class BanHandler {
      */
     public String getBanScreen(@NotNull String reason, long duration, @NotNull UUID uuid) {
         return messages.getListAsString("messages.screen.ban")
-                .replace("%reason%", reason)
+                .replace("%reason%", Objects.requireNonNull(this.getReason(reason)).getName())
                 .replace("%duration%", BanSystem.getInstance().getRemainingTime(duration))
                 .replace("%operator%", dataBase.getOperator(uuid));
     }
