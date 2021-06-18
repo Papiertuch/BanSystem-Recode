@@ -11,12 +11,14 @@ import java.util.List;
 
 public class Config {
 
+    private String config;
     private File file;
     private Path path;
     private Configuration configuration;
     private HashMap<String, Object> cache;
 
     public Config(String config) {
+        this.config = config;
         this.cache = new HashMap<>();
         this.file = new File("plugins/BanSystem");
         this.path = Paths.get("plugins/BanSystem/" + config);
@@ -45,6 +47,10 @@ public class Config {
         if (this.cache.containsKey(type)) {
             return (int) this.cache.get(type);
         }
+        if (configuration.get(type) == null) {
+            System.out.println("[Punish] empty value for type (" + type + ")");
+            return 0;
+        }
         this.cache.put(type, this.configuration.getInt(type));
         return (int) this.cache.get(type);
     }
@@ -53,6 +59,10 @@ public class Config {
         if (this.cache.containsKey(type)) {
             return (boolean) this.cache.get(type);
         }
+        if (configuration.get(type) == null) {
+            System.out.println("[Punish] empty value for type (" + type + ")");
+            return false;
+        }
         this.cache.put(type, this.configuration.getBoolean(type));
         return (boolean) this.cache.get(type);
     }
@@ -60,6 +70,10 @@ public class Config {
     public String getString(String type) {
         if (this.cache.containsKey(type)) {
             return (String) this.cache.get(type);
+        }
+        if (configuration.get(type) == null) {
+            System.out.println("[Punish] value \"" + type + "\" could not be found in the file \"" + config + "\"");
+            return null;
         }
         this.cache.put(type, this.configuration.getString(type)
                 .replace("%prefix%", this.configuration.getString("messages.prefix")));
