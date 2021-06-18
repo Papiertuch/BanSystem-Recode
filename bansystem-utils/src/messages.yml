@@ -83,6 +83,8 @@ messages:
       - '§cYou have been banned from yourserver.com'
       - ''
       - '§fReason §8» §a%reason%'
+      - '§fFrom §8» §a%operator%'
+      - ''
       - '§fRemaining time §8» §a%duration%'
       - ''
       - '§aMake a request for suspension at §nyourserver.com/appeal'

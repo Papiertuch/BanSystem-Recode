@@ -15,9 +15,11 @@ import lombok.Getter;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import javax.annotation.Nullable;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.UUID;
@@ -26,8 +28,9 @@ public class BanHandler {
 
     @Getter
     private IDataBase dataBase;
-    private Config config, messages;
-    private HashMap<String, Boolean> cache;
+    private final Config config;
+    private final Config messages;
+    private final HashMap<String, Boolean> cache;
 
     public BanHandler() {
         switch (BanSystem.getInstance().getConfig().getString("database.type")) {
@@ -120,7 +123,7 @@ public class BanHandler {
             banTime = -1;
         }
 
-        Reason reasonObject = getReason(reason);
+        Reason reasonObject = this.getReason(reason);
         if (reasonObject == null) {
             reasonObject = new Reason(reason, 0, duration, 0, false);
         }
@@ -152,7 +155,8 @@ public class BanHandler {
             dataBase.setAddressAsync(uuid, target.getAddress());
             target.disconnect(messages.getListAsString("messages.screen.ban")
                     .replace("%reason%", reason)
-                    .replace("%duration%", BanSystem.getInstance().getRemainingTime(banTime)));
+                    .replace("%duration%", BanSystem.getInstance().getRemainingTime(banTime))
+                    .replace("%operator%", dataBase.getOperator(uuid)));
         }
 
         return true;
@@ -204,8 +208,7 @@ public class BanHandler {
                         return false;
                     }
                 }
-            } else if (target != null && target.hasPermission(BanSystem.getInstance().getConfig().getString("permission.banBypass"))) {
-                System.out.println(target.getName());
+            } else if (target.hasPermission(BanSystem.getInstance().getConfig().getString("permission.banBypass"))) {
                 banPlayer.sendMessage(messages.getString("messages.cannotKicked"));
                 return false;
             }
@@ -214,12 +217,18 @@ public class BanHandler {
             if (teamPlayers != null) {
                 teamPlayers.sendMessage(messages.getListAsString("messages.notify.kick")
                         .replace("%target%", target.getDisplayName())
-                        .replace("%reason%", reason)
+                        .replace("%reason%", this.getReason(reason).getName())
                         .replace("%player%", banPlayer.getDisplayName()));
             }
         }
+
+        System.out.println(" -> " + banPlayer.getName());
+        System.out.println(" -> " + target.getName());
+        System.out.println(" -> " + target.getUniqueId());
+        System.out.println(" -> " + dataBase.getOperator(target.getUniqueId()));
+
         target.disconnect(messages.getListAsString("messages.screen.kick")
-                .replace("%reason%", reason)
+                .replace("%reason%", this.getReason(reason).getName())
                 .replace("%operator%", banPlayer.getName()));
         return true;
     }
@@ -295,19 +304,34 @@ public class BanHandler {
         return time;
     }
 
-    public String getBanScreen(String reason, long duration, UUID uuid) {
+    /**
+     * Get the ban screen from the {@link Config}
+     *
+     * @param reason   the ban reason
+     * @param duration the ban duration
+     * @param uuid     the {@link UUID} from the banned player
+     * @return the ban screen message
+     */
+    public String getBanScreen(@NotNull String reason, long duration, @NotNull UUID uuid) {
         return messages.getListAsString("messages.screen.ban")
                 .replace("%reason%", reason)
                 .replace("%duration%", BanSystem.getInstance().getRemainingTime(duration))
                 .replace("%operator%", dataBase.getOperator(uuid));
     }
 
-    public Reason getReason(String string) {
+    /**
+     * Get a new {@link Reason} object
+     *
+     * @param reasonInput the reason id or reason name
+     * @return the new {@link Reason} object
+     */
+    @Nullable
+    public Reason getReason(@NotNull String reasonInput) {
         for (Reason reason : BanSystem.getInstance().getBanReason()) {
-            if (reason.getName().equalsIgnoreCase(string)) {
+            if (reason.getName().equalsIgnoreCase(reasonInput)) {
                 return reason;
             }
-            if (String.valueOf(reason.getId()).equalsIgnoreCase(string)) {
+            if (String.valueOf(reason.getId()).equalsIgnoreCase(reasonInput)) {
                 return reason;
             }
         }

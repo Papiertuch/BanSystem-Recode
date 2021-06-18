@@ -7,9 +7,9 @@ import lombok.Getter;
 @AllArgsConstructor
 public class Reason {
 
-    private String name;
-    private int id;
-    private String duration;
-    private int points;
-    private boolean reportReason;
+    private final String name;
+    private final int id;
+    private final String duration;
+    private final int points;
+    private final boolean reportReason;
 }
