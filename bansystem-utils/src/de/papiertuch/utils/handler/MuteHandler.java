@@ -15,14 +15,15 @@ import lombok.Getter;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 public class MuteHandler {
 
     @Getter
     private IDataBase dataBase;
-    private Config config, messages;
-    private HashMap<String, Boolean> cache;
+    private final Config config, messages;
+    private final Map<String, Boolean> cache;
 
     public MuteHandler() {
         switch (BanSystem.getInstance().getConfig().getString("database.type")) {
@@ -75,7 +76,8 @@ public class MuteHandler {
                         return false;
                     }
                 }
-            } else if (target != null && target.hasPermission(BanSystem.getInstance().getConfig().getString("permission.banBypass"))) {
+            } else if (target != null && target.hasPermission(BanSystem.getInstance().getConfig().getString(
+                    "permission.banBypass"))) {
                 banPlayer.sendMessage(messages.getString("messages.cannotMuted"));
                 return false;
             }
@@ -156,7 +158,8 @@ public class MuteHandler {
         dataBase.setOperatorAsync(uuid, "");
         dataBase.setDateAsync(uuid, "");
         dataBase.setBanInfoAsync(uuid, "");
-        dataBase.editLastHistoryAsync(uuid, "unban", banPlayer.getName() + "-" + BanSystem.getInstance().getDateFormat().format(new Date()));
+        dataBase.editLastHistoryAsync(uuid, "unban",
+                banPlayer.getName() + "-" + BanSystem.getInstance().getDateFormat().format(new Date()));
         return true;
     }
 
