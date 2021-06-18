@@ -3,9 +3,7 @@ package de.papiertuch.proxy;
 import de.papiertuch.proxy.commands.KickCommand;
 import de.papiertuch.proxy.commands.LoginCommand;
 import de.papiertuch.proxy.commands.ban.*;
-import de.papiertuch.proxy.commands.mute.MuteCommand;
-import de.papiertuch.proxy.commands.mute.TempMuteCommand;
-import de.papiertuch.proxy.commands.mute.UnmuteCommand;
+import de.papiertuch.proxy.commands.mute.*;
 import de.papiertuch.proxy.listener.ChatListener;
 import de.papiertuch.proxy.listener.LoginListener;
 import de.papiertuch.proxy.listener.PlayerDisconnectListener;
@@ -47,12 +45,15 @@ public class ProxyCore extends Plugin {
         pluginManager.registerListener(this, new PostLoginListener());
 
         pluginManager.registerCommand(this, new BanCommand());
+        pluginManager.registerCommand(this, new BanHistoryCommand());
         pluginManager.registerCommand(this, new BanPointsCommand());
         pluginManager.registerCommand(this, new BanReduceCommand());
         pluginManager.registerCommand(this, new TempBanCommand());
         pluginManager.registerCommand(this, new UnbanCommand());
 
         pluginManager.registerCommand(this, new MuteCommand());
+        pluginManager.registerCommand(this, new MuteHistoryCommand());
+        pluginManager.registerCommand(this, new MuteReduceCommand());
         pluginManager.registerCommand(this, new TempMuteCommand());
         pluginManager.registerCommand(this, new UnmuteCommand());
 
