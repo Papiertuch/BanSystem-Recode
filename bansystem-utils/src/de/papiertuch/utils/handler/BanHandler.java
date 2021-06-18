@@ -79,12 +79,7 @@ public class BanHandler {
         return false;
     }
 
-    public boolean banPlayer(@NotNull IBanPlayer banPlayer, @NotNull String name, @NotNull String reason) {
-        return banPlayer(banPlayer, name, reason, Objects.requireNonNull(getReason(reason)).getDuration());
-    }
-
-    public boolean banPlayer(@NotNull IBanPlayer banPlayer, @NotNull String name, @NotNull String reason,
-                             @NotNull String duration, @NotNull String... info) {
+    public boolean banPlayer(IBanPlayer banPlayer, String name, String reason, String duration, String... info) {
         if (banPlayer.getName().equalsIgnoreCase(name)) {
             banPlayer.sendMessage(messages.getString("messages.selfBanned"));
             return false;
@@ -150,23 +145,23 @@ public class BanHandler {
             }
         }
         dataBase.addHistoryAsync(uuid, reasonObject.getName(), banPlayer.getName());
-        if (info.length == 1) {
-            dataBase.setBanInfoAsync(uuid, info[0]);
-            dataBase.editLastHistoryAsync(uuid, "banInfo", info[0]);
-        }
         dataBase.setDurationAsync(uuid, banTime);
         dataBase.addBanPointsAsync(uuid, reasonObject.getPoints());
         dataBase.setReason(uuid, reasonObject.getName());
         dataBase.setBannedAsync(uuid, true);
         dataBase.setDateAsync(uuid, BanSystem.getInstance().getDateFormat().format(new Date()));
         dataBase.setOperatorAsync(uuid, banPlayer.getName());
+        if (info.length == 1) {
+            dataBase.setBanInfoAsync(uuid, info[0]);
+            dataBase.editLastHistoryAsync(uuid, "banInfo", info[0]);
+        }
 
         if (target != null) {
             dataBase.setAddressAsync(uuid, target.getAddress());
             target.disconnect(messages.getListAsString("messages.screen.ban")
-                    .replace("%reason%", Objects.requireNonNull(this.getReason(reason)).getName())
+                    .replace("%reason%", reasonObject.getName())
                     .replace("%duration%", BanSystem.getInstance().getRemainingTime(banTime))
-                    .replace("%operator%", dataBase.getOperator(uuid)));
+                    .replace("%operator%", banPlayer.getName()));
         }
 
         return true;
@@ -181,7 +176,7 @@ public class BanHandler {
         long duration = (dataBase.getDuration(uuid) / reduce);
         for (IBanPlayer teamPlayers : BanSystem.getInstance().getNotify()) {
             if (teamPlayers != null) {
-                teamPlayers.sendMessage(messages.getListAsString("messages.notify.reduce")
+                teamPlayers.sendMessage(messages.getListAsString("messages.notify.reduceBan")
                         .replace("%target%", name)
                         .replace("%duration%", String.valueOf(BanSystem.getInstance().getRemainingTime(duration)))
                         .replace("%player%", banPlayer.getDisplayName()));
@@ -229,13 +224,13 @@ public class BanHandler {
             if (teamPlayers != null) {
                 teamPlayers.sendMessage(messages.getListAsString("messages.notify.kick")
                         .replace("%target%", target.getDisplayName())
-                        .replace("%reason%", Objects.requireNonNull(this.getReason(reason)).getName())
+                        .replace("%reason%", reason)
                         .replace("%player%", banPlayer.getDisplayName()));
             }
         }
 
         target.disconnect(messages.getListAsString("messages.screen.kick")
-                .replace("%reason%", Objects.requireNonNull(this.getReason(reason)).getName())
+                .replace("%reason%", reason)
                 .replace("%operator%", banPlayer.getName()));
         return true;
     }

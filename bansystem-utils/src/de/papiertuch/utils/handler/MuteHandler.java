@@ -12,6 +12,7 @@ import de.papiertuch.utils.database.MySQL;
 import de.papiertuch.utils.database.interfaces.IDataBase;
 import de.papiertuch.utils.player.interfaces.IBanPlayer;
 import lombok.Getter;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -39,10 +40,6 @@ public class MuteHandler {
         this.config = BanSystem.getInstance().getConfig();
         this.messages = BanSystem.getInstance().getMessages();
         this.cache = new HashMap<>();
-    }
-
-    public boolean mutePlayer(IBanPlayer banPlayer, String name, String reason) {
-        return mutePlayer(banPlayer, name, reason, getReason(reason).getDuration());
     }
 
     public boolean mutePlayer(IBanPlayer banPlayer, String name, String reason, String duration, String... info) {
@@ -121,11 +118,32 @@ public class MuteHandler {
         dataBase.setOperatorAsync(uuid, banPlayer.getName());
 
         if (target != null) {
-            target.disconnect(messages.getListAsString("messages.screen.mute")
+            target.sendMessage(messages.getListAsString("messages.screen.mute")
                     .replace("%reason%", reason)
                     .replace("%duration%", BanSystem.getInstance().getRemainingTime(banTime)));
         }
 
+        return true;
+    }
+
+    public boolean reduceMute(IBanPlayer banPlayer, String name, int reduce) {
+        UUID uuid = BanSystem.getInstance().getUuidFetcher().getUUID(name);
+        if (dataBase.isExists(uuid) && !dataBase.isBanned(uuid)) {
+            banPlayer.sendMessage(messages.getString("messages.notMuted"));
+            return false;
+        }
+        long duration = (dataBase.getDuration(uuid) / reduce);
+        for (IBanPlayer teamPlayers : BanSystem.getInstance().getNotify()) {
+            if (teamPlayers != null) {
+                teamPlayers.sendMessage(messages.getListAsString("messages.notify.reduceMute")
+                        .replace("%target%", name)
+                        .replace("%duration%", String.valueOf(BanSystem.getInstance().getRemainingTime(duration)))
+                        .replace("%player%", banPlayer.getDisplayName()));
+            }
+        }
+        dataBase.setDurationAsync(uuid, duration);
+        dataBase.editLastHistoryAsync(uuid, "reduce",
+                banPlayer.getName() + "-" + BanSystem.getInstance().getDateFormat().format(new Date()));
         return true;
     }
 

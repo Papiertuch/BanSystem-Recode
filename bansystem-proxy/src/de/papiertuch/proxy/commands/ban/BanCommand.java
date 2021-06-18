@@ -31,37 +31,18 @@ public class BanCommand extends Command {
             player.sendMessage(BanSystem.getInstance().getMessages().getString("messages.notLogin"));
             return;
         }
-        switch (args.length) {
-            case 3:
-                //TODO ADD /ban <Spieler> <Reason> <Info>
-            case 2:
-                String name = args[0];
-                String reason = args[1];
-                if (name.equalsIgnoreCase(player.getName())) {
-                    player.sendMessage(BanSystem.getInstance().getMessages().getString("messages.selfBanned"));
-                    return;
-                }
-                if (!isExists(reason)) {
-                    int i = 0;
-                    player.sendMessage(BanSystem.getInstance().getMessages().getString("messages.reasons").replace("%amount%", String.valueOf(BanSystem.getInstance().getBanReason().size())));
-                    for (Reason banReason : BanSystem.getInstance().getBanReason()) {
-                        i++;
-                        player.sendMessage(BanSystem.getInstance().getMessages().getString("messages.syntaxReason")
-                                .replace("%reason%", banReason.getName())
-                                .replace("%id%", String.valueOf(i))
-                                .replace("%duration%", banReason.getDuration().replace("-1", "Permanent")));
-                    }
-                    player.sendMessage(BanSystem.getInstance().getMessages().getString("messages.banSyntax"));
-                    return;
-                }
-                if (BanSystem.getInstance().getBanHandler().banPlayer(banPlayer, name, reason)) {
-                    ProxyServer.getInstance().getPluginManager().callEvent(new ProxiedPlayerBanEvent(banPlayer,
-                            BanSystem.getInstance().getUuidFetcher().getUUID(name),
-                            BanSystem.getInstance().getBanHandler().getReason(reason)));
-                }
-                break;
-            default:
+        if (args.length >= 2) {
+            String name = args[0];
+            String reason = args[1];
+            if (name.equalsIgnoreCase(player.getName())) {
+                player.sendMessage(BanSystem.getInstance().getMessages().getString("messages.selfBanned"));
+                return;
+            }
+            Reason reasonObject = BanSystem.getInstance().getBanHandler().getReason(reason);
+            if (reasonObject == null) {
                 int i = 0;
+                player.sendMessage(BanSystem.getInstance().getMessages().getString("messages.reasons").replace(
+                        "%amount%", String.valueOf(BanSystem.getInstance().getBanReason().size())));
                 for (Reason banReason : BanSystem.getInstance().getBanReason()) {
                     i++;
                     player.sendMessage(BanSystem.getInstance().getMessages().getString("messages.syntaxReason")
@@ -70,19 +51,26 @@ public class BanCommand extends Command {
                             .replace("%duration%", banReason.getDuration().replace("-1", "Permanent")));
                 }
                 player.sendMessage(BanSystem.getInstance().getMessages().getString("messages.banSyntax"));
-                break;
-        }
-    }
-
-    private boolean isExists(String string) {
-        for (Reason reason : BanSystem.getInstance().getBanReason()) {
-            if (reason.getName().equalsIgnoreCase(string)) {
-                return true;
+                return;
             }
-            if (String.valueOf(reason.getId()).equalsIgnoreCase(string)) {
-                return true;
+            if (BanSystem.getInstance().getBanHandler().banPlayer(banPlayer, name,
+                    reasonObject.getName(), reasonObject.getDuration(),
+                    args.length == 3 ? args[2] : ""))
+                ProxyServer.getInstance().getPluginManager().callEvent(new ProxiedPlayerBanEvent(banPlayer,
+                        BanSystem.getInstance().getUuidFetcher().getUUID(name),
+                      reasonObject));
+        } else {
+            int i = 0;
+            player.sendMessage(BanSystem.getInstance().getMessages().getString("messages.reasons").replace(
+                    "%amount%", String.valueOf(BanSystem.getInstance().getBanReason().size())));
+            for (Reason banReason : BanSystem.getInstance().getBanReason()) {
+                i++;
+                player.sendMessage(BanSystem.getInstance().getMessages().getString("messages.syntaxReason")
+                        .replace("%reason%", banReason.getName())
+                        .replace("%id%", String.valueOf(i))
+                        .replace("%duration%", banReason.getDuration().replace("-1", "Permanent")));
             }
+            player.sendMessage(BanSystem.getInstance().getMessages().getString("messages.banSyntax"));
         }
-        return false;
     }
 }
