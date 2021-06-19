@@ -8,6 +8,7 @@ import de.papiertuch.proxy.listener.ChatListener;
 import de.papiertuch.proxy.listener.LoginListener;
 import de.papiertuch.proxy.listener.PlayerDisconnectListener;
 import de.papiertuch.proxy.listener.PostLoginListener;
+import de.papiertuch.proxy.metrics.Metrics;
 import de.papiertuch.utils.BanSystem;
 import de.papiertuch.utils.Reason;
 import de.papiertuch.utils.player.ProxiedCommandSender;
@@ -35,6 +36,8 @@ public class ProxyCore extends Plugin {
                 BanSystem.getInstance().getConfig().getString("settings.banBypassing.duration"), 0, false);
 
         register();
+
+        new Metrics(this, 11742);
     }
 
     private void register() {
