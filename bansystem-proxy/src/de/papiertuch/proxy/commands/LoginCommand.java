@@ -35,7 +35,8 @@ public class LoginCommand extends Command {
         }
         BanSystem.getInstance().getNotify().add(banPlayer);
         BanSystem.getInstance().getPlayerDataBase().setNotifyAsync(banPlayer.getUniqueId(), true);
-        ProxyServer.getInstance().getPluginManager().callEvent(new ProxiedPlayerLoginNotifyEvent(player.getUniqueId(), false));
+        ProxyServer.getInstance().getPluginManager().callEvent(new ProxiedPlayerLoginNotifyEvent(player.getUniqueId()
+                , true));
         player.sendMessage(BanSystem.getInstance().getMessages().getString("messages.login"));
     }
 }
