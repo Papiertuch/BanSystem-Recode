@@ -67,7 +67,7 @@ public class LoginListener implements Listener {
                     event.setCancelled(true);
                 }
             } else if (dataBase.isIpBanned(address)) {
-                Reason reason = ProxyCore.getInstance().getBanBypassingReason();
+                Reason reason = BanSystem.getInstance().getBanBypassingReason();
                 if (BanSystem.getInstance().getBanHandler().banPlayer(new ProxiedCommandSender(ProxyServer.getInstance().getConsole()), event.getConnection().getName(), reason.getName(), reason.getDuration())) {
                     ProxyServer.getInstance().getPluginManager().callEvent(new ProxiedPlayerBanEvent(ProxyCore.getInstance().getConsolePlayer(),
                             uuid, reason));

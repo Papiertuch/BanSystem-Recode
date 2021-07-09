@@ -10,7 +10,6 @@ import de.papiertuch.proxy.listener.PlayerDisconnectListener;
 import de.papiertuch.proxy.listener.PostLoginListener;
 import de.papiertuch.proxy.metrics.Metrics;
 import de.papiertuch.utils.BanSystem;
-import de.papiertuch.utils.Reason;
 import de.papiertuch.utils.player.ProxiedCommandSender;
 import de.papiertuch.utils.player.interfaces.IBanPlayer;
 import lombok.Getter;
@@ -23,7 +22,7 @@ public class ProxyCore extends Plugin {
     @Getter
     private static ProxyCore instance;
     private IBanPlayer consolePlayer;
-    private Reason banBypassingReason;
+
 
     @Override
     public void onEnable() {
@@ -31,13 +30,12 @@ public class ProxyCore extends Plugin {
 
         new BanSystem(this.getProxy().getVersion(), this.getDescription().getVersion());
 
-        this.consolePlayer = BanSystem.getInstance().loadBanPlayer(new ProxiedCommandSender(getProxy().getConsole()));
-        this.banBypassingReason = new Reason(BanSystem.getInstance().getConfig().getString("settings.banBypassing.name"), 0,
-                BanSystem.getInstance().getConfig().getString("settings.banBypassing.duration"), 0, false);
+        this.consolePlayer =
+                BanSystem.getInstance().loadBanPlayer(new ProxiedCommandSender(this.getProxy().getConsole()));
 
         register();
 
-        new Metrics(this, 11742);
+        new Metrics(this, 11744);
     }
 
     private void register() {

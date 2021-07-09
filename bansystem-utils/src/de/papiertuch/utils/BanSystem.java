@@ -32,6 +32,7 @@ public class BanSystem {
     private MuteHandler muteHandler;
     private ReportHandler reportHandler;
     private SimpleDateFormat dateFormat;
+    private Reason banBypassingReason;
 
     private HashMap<UUID, IBanPlayer> banPlayerHashMap;
     private HashMap<String, List<UUID>> accounts;
@@ -53,12 +54,6 @@ public class BanSystem {
         System.out.println("");
 
         this.version = checkUpdate();
- /*
-       if (!this.version.equalsIgnoreCase(currentVersion)) {
-           System.out.println("[Punish] A new version is available: " + this.version);
-           System.out.println("[Punish] Download: https://www.spigotmc.org/resources/bansystem-for-bungeecord-or-bukkit-mysql.57979/");
-       }
-  */
 
         this.dateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm");
 
@@ -102,6 +97,9 @@ public class BanSystem {
                     config.getInt("settings.muteReason." + i + ".points"),
                     config.getBoolean("settings.muteReason." + i + ".isReportReason")));
         }
+
+        this.banBypassingReason = new Reason(BanSystem.getInstance().getConfig().getString("settings.banBypassing.name"), 0,
+                BanSystem.getInstance().getConfig().getString("settings.banBypassing.duration"), 0, false);
     }
 
     public IBanPlayer loadBanPlayer(IBanPlayer banPlayer) {
