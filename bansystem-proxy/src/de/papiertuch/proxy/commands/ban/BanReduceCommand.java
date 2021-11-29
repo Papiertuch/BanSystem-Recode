@@ -39,7 +39,7 @@ public class BanReduceCommand extends Command {
                 }
                 break;
             default:
-                player.sendMessage(BanSystem.getInstance().getConfig().getString("permissions.reduceSyntax"));
+                player.sendMessage(BanSystem.getInstance().getConfig().getString("messages.reduceSyntax"));
                 break;
         }
     }
